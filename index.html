@@ -3,271 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🚀 Марсианская колония</title>
+    <title>⚔️ Ведьмак: Тень Белого Волка</title>
     <style>
         * { box-sizing: border-box; }
         body {
-            margin: 0; padding: 12px; background: #0d1117; color: #c9d1d9;
-            font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
+            margin: 0; padding: 12px; background: #0a0c0f; color: #d4cfc4;
+            font-family: 'Cinzel', 'Segoe UI', serif; min-height: 100vh;
+            background-image: radial-gradient(circle at 20% 30%, #1a2a1f, #0a0c0f);
         }
         .game-container {
-            max-width: 420px; margin: 0 auto; background: #161b22;
-            border-radius: 24px; padding: 20px; border: 1px solid #30363d;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            max-width: 420px; margin: 0 auto; background: rgba(10, 15, 10, 0.95);
+            border-radius: 32px; padding: 20px; border: 2px solid #5a6b4b;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9); backdrop-filter: blur(4px);
         }
-        h2 { margin: 0 0 8px; color: #ff7b72; display: flex; align-items: center; gap: 8px; }
-        .day-badge { background: #238636; padding: 4px 12px; border-radius: 20px; font-size: 14px; color: white; }
-        .resources { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
-        .res-card {
-            background: #21262d; padding: 8px 4px; border-radius: 12px; text-align: center;
-            border-bottom: 3px solid #ff7b72;
+        h2 {
+            margin: 0 0 8px; color: #b9a57c; text-shadow: 2px 2px 0 #1e2a1a;
+            display: flex; align-items: center; gap: 8px; font-size: 22px;
         }
-        .res-name { font-size: 11px; color: #8b949e; }
-        .res-value { font-size: 18px; font-weight: bold; display: block; margin-top: 4px; }
-        .upgrades {
-            background: #21262d; border-radius: 16px; padding: 12px; margin-bottom: 16px;
+        .witcher-icon { font-size: 28px; }
+        .stats {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;
         }
-        .upgrade-title { font-weight: bold; margin-bottom: 8px; color: #d2a8ff; }
-        .upgrade-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 0; border-bottom: 1px solid #30363d;
+        .stat-card {
+            background: #1c261c; padding: 10px; border-radius: 16px;
+            border: 1px solid #6a7a5a; text-align: center;
         }
-        .upgrade-row:last-child { border-bottom: none; }
-        .upgrade-btn {
-            background: #30363d; border: none; color: white; padding: 6px 12px;
-            border-radius: 20px; font-size: 12px; cursor: pointer;
-            transition: 0.15s; border: 1px solid #8b949e;
+        .stat-name { font-size: 12px; color: #9aad8a; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #e0d4b2; }
+        .hp-bar { color: #b34a4a; }
+        .tox-bar { color: #6a9a5a; }
+
+        .location-panel {
+            background: #131c13; border-radius: 24px; padding: 16px; margin: 15px 0;
+            border: 1px solid #7a8a6a; text-align: center;
         }
-        .upgrade-btn:active { background: #ff7b72; transform: scale(0.96); }
-        .upgrade-btn:disabled { opacity: 0.4; pointer-events: none; }
-        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .loc-name { font-size: 20px; font-weight: bold; color: #d4c49a; margin-bottom: 8px; }
+        .loc-desc { font-size: 14px; color: #b0b89a; min-height: 40px; margin-bottom: 12px; }
+
+        .action-buttons {
+            display: flex; flex-direction: column; gap: 10px; margin: 16px 0;
+        }
         .btn {
-            background: #238636; border: none; color: white; padding: 14px;
-            font-size: 16px; font-weight: bold; border-radius: 40px; cursor: pointer;
-            transition: 0.15s; box-shadow: 0 4px 0 #0d4520; border: 1px solid #3fb950;
+            background: #2a352a; border: 2px solid #7a9a5a; color: #efe0c0;
+            padding: 14px; font-size: 16px; font-weight: bold; border-radius: 40px;
+            cursor: pointer; transition: 0.15s; box-shadow: 0 5px 0 #1a261a;
+            font-family: inherit; text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0d4520; }
-        .btn.danger { background: #da3633; box-shadow: 0 4px 0 #8b1e1a; border-color: #f85149; }
-        .btn.warning { background: #9e6a03; box-shadow: 0 4px 0 #634d00; border-color: #d29922; }
-        .btn:disabled { opacity: 0.5; transform: none; box-shadow: 0 4px 0 #0d4520; pointer-events: none; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1a261a; }
+        .btn.witcher-red { background: #4a2a2a; border-color: #b34a4a; box-shadow: 0 5px 0 #2a1a1a; }
+        .btn.witcher-blue { background: #2a3a4a; border-color: #5a8aaa; box-shadow: 0 5px 0 #1a2a3a; }
+        .btn:disabled { opacity: 0.5; transform: none; box-shadow: 0 5px 0 #1a261a; pointer-events: none; }
+
+        .inventory {
+            background: #1a221a; border-radius: 20px; padding: 12px; margin: 12px 0;
+            border: 1px dashed #7a9a5a;
+        }
+        .inv-title { color: #b9a57c; margin-bottom: 8px; font-size: 14px; }
+        .potion-btn {
+            background: #2a352a; border: 1px solid #9aad8a; color: #efe0c0;
+            padding: 8px 12px; margin: 4px; border-radius: 30px; font-size: 13px;
+            cursor: pointer; display: inline-block;
+        }
+
         .event-log {
-            background: #0d1117; border-radius: 16px; padding: 12px; margin: 16px 0;
-            border-left: 4px solid #ff7b72; font-size: 13px; max-height: 80px; overflow-y: auto;
+            background: #0e130e; border-radius: 16px; padding: 14px; margin: 16px 0;
+            border-left: 6px solid #b9a57c; font-size: 14px; max-height: 100px;
+            overflow-y: auto; color: #c0c8b0;
         }
         .reset-btn {
-            background: #21262d; border: 1px solid #8b949e; color: #c9d1d9;
+            background: #1e261e; border: 1px solid #6a7a5a; color: #b0b89a;
             padding: 12px; font-size: 14px; width: 100%; margin-top: 8px;
         }
-        .game-over-msg { color: #f85149; font-weight: bold; text-align: center; margin-top: 10px; }
-        .badge { background: #1f6feb; border-radius: 12px; padding: 2px 8px; font-size: 12px; margin-left: 6px; }
+        .death-msg { color: #d44; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <h2>🚀 КОЛОНИЯ "ЭЛИЗИЙ" <span class="day-badge" id="dayDisplay">День 1</span></h2>
+    <h2><span class="witcher-icon">🐺</span> ВЕДЬМАК: ТЕНЬ БЕЛОГО ВОЛКА</h2>
     
-    <!-- РЕСУРСЫ -->
-    <div class="resources">
-        <div class="res-card"><span class="res-name">⚡ Энергия</span> <span class="res-value" id="energyVal">15</span></div>
-        <div class="res-card"><span class="res-name">🌬 Кислород</span> <span class="res-value" id="oxygenVal">15</span></div>
-        <div class="res-card"><span class="res-name">⚙️ Металл</span> <span class="res-value" id="metalVal">8</span></div>
-        <div class="res-card"><span class="res-name">🔬 Наука</span> <span class="res-value" id="scienceVal">0</span></div>
+    <!-- СТАТЫ -->
+    <div class="stats">
+        <div class="stat-card"><span class="stat-name">❤️ Здоровье</span> <span class="stat-value hp-bar" id="hpVal">40</span></div>
+        <div class="stat-card"><span class="stat-name">🧪 Токсичность</span> <span class="stat-value tox-bar" id="toxVal">0/100</span></div>
     </div>
 
-    <!-- УЛУЧШЕНИЯ -->
-    <div class="upgrades">
-        <div class="upgrade-title">🛠️ УЛУЧШЕНИЯ БАЗЫ</div>
-        <div class="upgrade-row">
-            <span>☀️ Солнечные панели <span class="badge" id="solarLvl">0</span></span>
-            <button class="upgrade-btn" id="upgradeSolarBtn" onclick="upgradeSolar()">🔧 10⚙️ 5🔬</button>
-        </div>
-        <div class="upgrade-row">
-            <span>🌡️ Эффективность O2 <span class="badge" id="oxyLvl">0</span></span>
-            <button class="upgrade-btn" id="upgradeOxyBtn" onclick="upgradeOxygen()">🔧 8⚙️ 8🔬</button>
+    <!-- ЛОКАЦИЯ -->
+    <div class="location-panel">
+        <div class="loc-name" id="locName">🏡 Белый Сад</div>
+        <div class="loc-desc" id="locDesc">Деревня на окраине Темерии. Люди напуганы.</div>
+    </div>
+
+    <!-- ИНВЕНТАРЬ (ЭЛИКСИРЫ) -->
+    <div class="inventory">
+        <div class="inv-title">🧴 ЭЛИКСИРЫ</div>
+        <div id="potionPanel">
+            <button class="potion-btn" onclick="usePotion('swallow')">🐦 Ласточка (2)</button>
+            <button class="potion-btn" onclick="usePotion('cat')">🐱 Кошка (1)</button>
+            <button class="potion-btn" onclick="usePotion('thunder')">⚡ Гром (1)</button>
         </div>
     </div>
 
     <!-- ОСНОВНЫЕ ДЕЙСТВИЯ -->
     <div class="action-buttons">
-        <button class="btn" id="mineBtn" onclick="actionMine()">⛏ Добыть металл (-2⚡ / +3⚙️)</button>
-        <button class="btn" id="farmBtn" onclick="actionFarm()">🌱 Вырастить еду (-1⚡ / +2🌬 +2⚙️)</button>
-        <button class="btn warning" id="researchBtn" onclick="actionResearch()">🔬 Исследование (-3⚡ / +3🔬)</button>
-        <button class="btn" id="repairBtn" onclick="actionRepair()">🔧 Обслужить базу (-2⚙️ / +4⚡)</button>
-        <button class="btn danger" id="nextDayBtn" onclick="actionNextDay()">📆 Следующий день (-3⚡ -4🌬)</button>
+        <button class="btn" id="exploreBtn" onclick="explore()">🔍 ИССЛЕДОВАТЬ</button>
+        <button class="btn witcher-red" id="fightBtn" onclick="enterFight()">⚔️ ВСТУПИТЬ В БОЙ</button>
+        <button class="btn witcher-blue" id="meditateBtn" onclick="meditate()">🕯️ МЕДИТАЦИЯ</button>
     </div>
 
-    <!-- ЖУРНАЛ СОБЫТИЙ -->
-    <div class="event-log" id="eventLog">🚀 База готова. Начните развитие!</div>
+    <!-- СМЕНА ЛОКАЦИИ -->
+    <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button class="btn" style="flex:1; padding: 10px; font-size: 13px;" onclick="changeLocation('village')">🏡 Деревня</button>
+        <button class="btn" style="flex:1; padding: 10px; font-size: 13px;" onclick="changeLocation('forest')">🌲 Лес</button>
+        <button class="btn" style="flex:1; padding: 10px; font-size: 13px;" onclick="changeLocation('cave')">🕯️ Пещера</button>
+    </div>
+
+    <!-- ЖУРНАЛ -->
+    <div class="event-log" id="eventLog">Вы в Белом Саду. Слухи о чудовищах...</div>
 
     <!-- СБРОС -->
-    <button class="btn reset-btn" onclick="resetGame()">🔄 Начать миссию заново</button>
-    <div id="gameOverMsg" class="game-over-msg"></div>
+    <button class="reset-btn" onclick="resetGame()">🔄 НАЧАТЬ ПУТЬ ЗАНОВО</button>
+    <div id="deathMsg" class="death-msg"></div>
 </div>
 
 <script>
-    // ---------- СОСТОЯНИЕ ИГРЫ ----------
-    let energy = 15;
-    let oxygen = 15;
-    let metal = 8;
-    let science = 0;
-    let day = 1;
+    // ---------- СОСТОЯНИЕ ВЕДЬМАКА ----------
+    let hp = 40, maxHp = 40;
+    let toxicity = 0;
+    let location = 'village'; // village, forest, cave
+    
+    // Эликсиры
+    let potions = { swallow: 2, cat: 1, thunder: 1 };
+    
+    // Флаги квестов
+    let villageQuestDone = false;
+    let monsterInCave = true;
+    
     let gameOver = false;
 
-    // Уровни улучшений
-    let solarLevel = 0;      // каждый уровень +1 к энергии от "Следующий день" (смягчение)
-    let oxygenEff = 0;       // каждый уровень -0.5 к потере кислорода
+    // DOM
+    const hpEl = document.getElementById('hpVal');
+    const toxEl = document.getElementById('toxVal');
+    const locNameEl = document.getElementById('locName');
+    const locDescEl = document.getElementById('locDesc');
+    const eventLogEl = document.getElementById('eventLog');
+    const deathMsgEl = document.getElementById('deathMsg');
 
-    // Случайные события
-    const events = [
-        { name: "Пылевая буря", effect: () => { if(!gameOver) { energy = Math.max(0, energy - 3); metal = Math.max(0, metal - 2); return "🌪️ Пылевая буря! -3⚡ -2⚙️"; } } },
-        { name: "Находка руды", effect: () => { if(!gameOver) { metal += 5; return "💎 Нашли богатую жилу! +5⚙️"; } } },
-        { name: "Поломка дрона", effect: () => { if(!gameOver) { energy = Math.max(0, energy - 2); return "🤖 Дрон сломался, -2⚡ на ремонт"; } } },
-        { name: "Солнечный день", effect: () => { if(!gameOver) { energy += 4; return "☀️ Идеальная погода! +4⚡"; } } },
-        { name: "Утечка кислорода", effect: () => { if(!gameOver) { oxygen = Math.max(0, oxygen - 4); return "💨 Утечка в отсеке! -4🌬"; } } },
-        { name: "Метеорит", effect: () => { if(!gameOver) { metal += 8; energy = Math.max(0, energy - 1); return "☄️ Метеорит принёс металл! +8⚙️ -1⚡"; } } }
-    ];
-
-    // DOM элементы
-    const energyEl = document.getElementById('energyVal');
-    const oxygenEl = document.getElementById('oxygenVal');
-    const metalEl = document.getElementById('metalVal');
-    const scienceEl = document.getElementById('scienceVal');
-    const dayEl = document.getElementById('dayDisplay');
-    const eventLog = document.getElementById('eventLog');
-    const gameOverMsg = document.getElementById('gameOverMsg');
-    const solarLvlEl = document.getElementById('solarLvl');
-    const oxyLvlEl = document.getElementById('oxyLvl');
+    // Локации
+    const locations = {
+        village: { name: '🏡 Белый Сад', desc: 'Деревня. Жители боятся монстра из леса.' },
+        forest: { name: '🌲 Дремучий лес', desc: 'Сосны, волки, и что-то похуже.' },
+        cave: { name: '🕯️ Забытая пещера', desc: 'Темно. Пахнет гнилью и серой.' }
+    };
 
     // ---------- ОБНОВЛЕНИЕ UI ----------
-    function updateUI(message) {
-        energyEl.textContent = Math.floor(energy);
-        oxygenEl.textContent = Math.floor(oxygen);
-        metalEl.textContent = Math.floor(metal);
-        scienceEl.textContent = Math.floor(science);
-        dayEl.textContent = `День ${day}`;
-        solarLvlEl.textContent = solarLevel;
-        oxyLvlEl.textContent = oxygenEff;
+    function updateUI(msg) {
+        hpEl.textContent = hp;
+        toxEl.textContent = toxicity + '/100';
+        locNameEl.textContent = locations[location].name;
+        locDescEl.textContent = locations[location].desc;
+        if (msg) eventLogEl.innerHTML = msg;
         
-        if (message) eventLog.innerHTML = message;
-
-        // Проверка поражения
-        if (!gameOver && (energy <= 0 || oxygen <= 0)) {
+        // Смерть
+        if (!gameOver && hp <= 0) {
             gameOver = true;
-            let reason = energy <= 0 ? "Энергия исчерпана. Колония замерзла." : "Кислород кончился. Миссия провалена.";
-            gameOverMsg.innerHTML = `💀 ${reason}`;
-            eventLog.innerHTML = "Игра окончена. Нажмите 'Начать заново'.";
+            deathMsgEl.innerHTML = '💀 Ведьмак погиб... Судьба настигла его.';
+            eventLogEl.innerHTML = 'Вы мертвы. Нажмите "Начать путь заново".';
         }
-
-        // Блокировка кнопок
-        const btns = ['mineBtn', 'farmBtn', 'researchBtn', 'repairBtn', 'nextDayBtn', 'upgradeSolarBtn', 'upgradeOxyBtn'];
-        btns.forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) btn.disabled = gameOver;
+        if (toxicity >= 100) {
+            hp = Math.max(0, hp - 15);
+            toxicity = 80;
+            updateUI('🧪 Сильное отравление! Вы теряете 15 HP.');
+        }
+        if (hp > maxHp) hp = maxHp;
+        
+        // Обновить кнопки эликсиров
+        document.querySelectorAll('.potion-btn').forEach((btn, idx) => {
+            const type = idx === 0 ? 'swallow' : (idx === 1 ? 'cat' : 'thunder');
+            btn.textContent = `${type === 'swallow' ? '🐦 Ласточка' : (type === 'cat' ? '🐱 Кошка' : '⚡ Гром')} (${potions[type]})`;
+            btn.disabled = gameOver || potions[type] <= 0;
         });
-    }
-
-    // Проверка стоимости
-    function canAfford(eCost, oCost, mCost, sCost = 0) {
-        if (gameOver) return false;
-        if (energy < eCost) { eventLog.innerHTML = "❌ Недостаточно энергии!"; return false; }
-        if (oxygen < oCost) { eventLog.innerHTML = "❌ Недостаточно кислорода!"; return false; }
-        if (metal < mCost) { eventLog.innerHTML = "❌ Недостаточно металла!"; return false; }
-        if (science < sCost) { eventLog.innerHTML = "❌ Недостаточно науки!"; return false; }
-        return true;
-    }
-
-    // ---------- ДЕЙСТВИЯ ----------
-    function actionMine() {
-        if (!canAfford(2, 0, 0)) return;
-        energy -= 2;
-        metal += 3;
-        updateUI("⛏ Добыто 3 металла. -2 энергии.");
-    }
-
-    function actionFarm() {
-        if (!canAfford(1, 0, 0)) return;
-        energy -= 1;
-        oxygen += 2;
-        metal += 2;
-        updateUI("🌱 Ферма дала +2🌬 и +2⚙️. -1⚡.");
-    }
-
-    function actionResearch() {
-        if (!canAfford(3, 0, 0)) return;
-        energy -= 3;
-        science += 3;
-        updateUI("🔬 Проведены исследования! +3🔬. -3⚡.");
-    }
-
-    function actionRepair() {
-        if (!canAfford(0, 0, 2)) return;
-        metal -= 2;
-        energy += 4;
-        updateUI("🔧 База обслужена. +4⚡. -2⚙️.");
-    }
-
-    function actionNextDay() {
-        if (gameOver) return;
-
-        // Базовые затраты с учётом улучшений
-        let energyCost = Math.max(1, 3 - solarLevel);
-        let oxygenCost = Math.max(2, 4 - Math.floor(oxygenEff / 2));
         
-        energy = Math.max(0, energy - energyCost);
-        oxygen = Math.max(0, oxygen - oxygenCost);
-        day++;
-        
-        let msg = `📆 День ${day}. Потрачено ${energyCost}⚡ и ${oxygenCost}🌬.`;
+        const btns = ['exploreBtn', 'fightBtn', 'meditateBtn'];
+        btns.forEach(id => { if(document.getElementById(id)) document.getElementById(id).disabled = gameOver; });
+    }
 
-        // СЛУЧАЙНОЕ СОБЫТИЕ (шанс 40%)
-        if (!gameOver && Math.random() < 0.4) {
-            const evt = events[Math.floor(Math.random() * events.length)];
-            const evtMsg = evt.effect();
-            if (evtMsg) msg += ` ${evtMsg}`;
+    // Случайное число
+    function rnd(max) { return Math.floor(Math.random() * max); }
+
+    // ---------- МЕХАНИКИ ----------
+    function changeLocation(loc) {
+        if(gameOver) return;
+        location = loc;
+        let msg = `Вы направились в ${locations[loc].name}.`;
+        if(loc === 'forest' && !villageQuestDone) msg += ' Староста просил убить чудовище.';
+        updateUI(msg);
+    }
+
+    function explore() {
+        if(gameOver) return;
+        let msg = '';
+        if(location === 'village') {
+            if(!villageQuestDone) {
+                msg = 'Староста: "Убей Мглистого в пещере, заплачу 50 крон!" Вы получили зелье Ласточки.';
+                potions.swallow++;
+                villageQuestDone = true;
+            } else msg = 'Жители благодарят вас, но новых заказов нет.';
+        } else if(location === 'forest') {
+            let r = rnd(3);
+            if(r === 0) { msg = 'Вы нашли травы. Токсичность -10.'; toxicity = Math.max(0, toxicity-10); }
+            else if(r === 1) { msg = 'Волки! Вы отбились, но получили раны. -5 HP.'; hp = Math.max(0, hp-5); }
+            else { msg = 'Вы нашли бутылку с "Кошкой".'; potions.cat++; }
+        } else if(location === 'cave') {
+            if(monsterInCave) msg = 'В глубине пещеры что-то рычит...';
+            else msg = 'Пусто. Только кости.';
         }
+        updateUI(msg);
+    }
 
-        // Проверка на смерть после события
-        if (energy <= 0 || oxygen <= 0) {
+    function enterFight() {
+        if(gameOver) return;
+        if(location === 'cave' && monsterInCave) {
+            // БОЙ С БОССОМ
+            let dmg = rnd(15)+10;
+            hp = Math.max(0, hp - dmg);
+            let msg = `🐉 МГЛИСТЫЙ атакует! Вы получили ${dmg} урона. `;
+            if(hp > 0) {
+                msg += 'Вы нанесли ответный удар! Чудовище повержено. Вы нашли Гром.';
+                potions.thunder++;
+                monsterInCave = false;
+                toxicity = Math.min(100, toxicity+15);
+            }
             updateUI(msg);
         } else {
-            updateUI(msg);
+            let r = rnd(3);
+            if(r === 0) { hp = Math.max(0, hp-8); updateUI('Утопец оцарапал вас. -8 HP.'); }
+            else if(r === 1) { hp = Math.max(0, hp-4); updateUI('Вы убили гуля. -4 HP.'); }
+            else { updateUI('Вы не нашли противников.'); }
         }
     }
 
-    // ---------- УЛУЧШЕНИЯ ----------
-    function upgradeSolar() {
-        if (!canAfford(0, 0, 10, 5)) return;
-        metal -= 10;
-        science -= 5;
-        solarLevel++;
-        updateUI(`☀️ Солнечные панели улучшены до уровня ${solarLevel}! Теперь каждый день тратится на 1⚡ меньше.`);
+    function meditate() {
+        if(gameOver) return;
+        let heal = 10 + rnd(10);
+        hp = Math.min(maxHp, hp + heal);
+        toxicity = Math.max(0, toxicity - 20);
+        updateUI(`🕯️ Медитация восстановила ${heal} HP и снизила токсичность.`);
     }
 
-    function upgradeOxygen() {
-        if (!canAfford(0, 0, 8, 8)) return;
-        metal -= 8;
-        science -= 8;
-        oxygenEff++;
-        updateUI(`🌡️ Эффективность кислорода повышена до ${oxygenEff}! Потери 🌬 снижены.`);
+    function usePotion(type) {
+        if(gameOver || potions[type] <= 0) return;
+        potions[type]--;
+        if(type === 'swallow') { hp = Math.min(maxHp, hp+20); toxicity += 25; }
+        else if(type === 'cat') { hp = Math.min(maxHp, hp+10); toxicity += 10; }
+        else if(type === 'thunder') { hp = Math.min(maxHp, hp+30); toxicity += 40; }
+        updateUI(`Выпито: ${type}.`);
     }
 
-    // ---------- СБРОС ----------
     function resetGame() {
-        energy = 15;
-        oxygen = 15;
-        metal = 8;
-        science = 0;
-        day = 1;
-        solarLevel = 0;
-        oxygenEff = 0;
-        gameOver = false;
-        gameOverMsg.innerHTML = '';
-        updateUI("🚀 Новая миссия! Развивайте базу и исследуйте Марс.");
+        hp = 40; toxicity = 0; location = 'village';
+        potions = { swallow: 2, cat: 1, thunder: 1 };
+        villageQuestDone = false; monsterInCave = true;
+        gameOver = false; deathMsgEl.innerHTML = '';
+        updateUI('Новое приключение начинается...');
     }
 
-    // Инициализация
-    updateUI("🚀 База 'Элизий' онлайн. Добывайте металл и исследуйте технологии!");
+    // Старт
+    updateUI('Вы в Белом Саду. Слухи о чудовищах...');
 </script>
 </body>
-  </html>
+                </html>
