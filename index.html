@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🚀 Марсианская колония</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 12px; background: #0d1117; color: #c9d1d9;
+            font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
+        }
+        .game-container {
+            max-width: 420px; margin: 0 auto; background: #161b22;
+            border-radius: 24px; padding: 20px; border: 1px solid #30363d;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        h2 { margin: 0 0 8px; color: #ff7b72; display: flex; align-items: center; gap: 8px; }
+        .day-badge { background: #238636; padding: 4px 12px; border-radius: 20px; font-size: 14px; color: white; }
+        .resources { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+        .res-card {
+            background: #21262d; padding: 8px 4px; border-radius: 12px; text-align: center;
+            border-bottom: 3px solid #ff7b72;
+        }
+        .res-name { font-size: 11px; color: #8b949e; }
+        .res-value { font-size: 18px; font-weight: bold; display: block; margin-top: 4px; }
+        .upgrades {
+            background: #21262d; border-radius: 16px; padding: 12px; margin-bottom: 16px;
+        }
+        .upgrade-title { font-weight: bold; margin-bottom: 8px; color: #d2a8ff; }
+        .upgrade-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 6px 0; border-bottom: 1px solid #30363d;
+        }
+        .upgrade-row:last-child { border-bottom: none; }
+        .upgrade-btn {
+            background: #30363d; border: none; color: white; padding: 6px 12px;
+            border-radius: 20px; font-size: 12px; cursor: pointer;
+            transition: 0.15s; border: 1px solid #8b949e;
+        }
+        .upgrade-btn:active { background: #ff7b72; transform: scale(0.96); }
+        .upgrade-btn:disabled { opacity: 0.4; pointer-events: none; }
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .btn {
+            background: #238636; border: none; color: white; padding: 14px;
+            font-size: 16px; font-weight: bold; border-radius: 40px; cursor: pointer;
+            transition: 0.15s; box-shadow: 0 4px 0 #0d4520; border: 1px solid #3fb950;
+        }
+        .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #0d4520; }
+        .btn.danger { background: #da3633; box-shadow: 0 4px 0 #8b1e1a; border-color: #f85149; }
+        .btn.warning { background: #9e6a03; box-shadow: 0 4px 0 #634d00; border-color: #d29922; }
+        .btn:disabled { opacity: 0.5; transform: none; box-shadow: 0 4px 0 #0d4520; pointer-events: none; }
+        .event-log {
+            background: #0d1117; border-radius: 16px; padding: 12px; margin: 16px 0;
+            border-left: 4px solid #ff7b72; font-size: 13px; max-height: 80px; overflow-y: auto;
+        }
+        .reset-btn {
+            background: #21262d; border: 1px solid #8b949e; color: #c9d1d9;
+            padding: 12px; font-size: 14px; width: 100%; margin-top: 8px;
+        }
+        .game-over-msg { color: #f85149; font-weight: bold; text-align: center; margin-top: 10px; }
+        .badge { background: #1f6feb; border-radius: 12px; padding: 2px 8px; font-size: 12px; margin-left: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>🚀 КОЛОНИЯ "ЭЛИЗИЙ" <span class="day-badge" id="dayDisplay">День 1</span></h2>
+    
+    <!-- РЕСУРСЫ -->
+    <div class="resources">
+        <div class="res-card"><span class="res-name">⚡ Энергия</span> <span class="res-value" id="energyVal">15</span></div>
+        <div class="res-card"><span class="res-name">🌬 Кислород</span> <span class="res-value" id="oxygenVal">15</span></div>
+        <div class="res-card"><span class="res-name">⚙️ Металл</span> <span class="res-value" id="metalVal">8</span></div>
+        <div class="res-card"><span class="res-name">🔬 Наука</span> <span class="res-value" id="scienceVal">0</span></div>
+    </div>
+
+    <!-- УЛУЧШЕНИЯ -->
+    <div class="upgrades">
+        <div class="upgrade-title">🛠️ УЛУЧШЕНИЯ БАЗЫ</div>
+        <div class="upgrade-row">
+            <span>☀️ Солнечные панели <span class="badge" id="solarLvl">0</span></span>
+            <button class="upgrade-btn" id="upgradeSolarBtn" onclick="upgradeSolar()">🔧 10⚙️ 5🔬</button>
+        </div>
+        <div class="upgrade-row">
+            <span>🌡️ Эффективность O2 <span class="badge" id="oxyLvl">0</span></span>
+            <button class="upgrade-btn" id="upgradeOxyBtn" onclick="upgradeOxygen()">🔧 8⚙️ 8🔬</button>
+        </div>
+    </div>
+
+    <!-- ОСНОВНЫЕ ДЕЙСТВИЯ -->
+    <div class="action-buttons">
+        <button class="btn" id="mineBtn" onclick="actionMine()">⛏ Добыть металл (-2⚡ / +3⚙️)</button>
+        <button class="btn" id="farmBtn" onclick="actionFarm()">🌱 Вырастить еду (-1⚡ / +2🌬 +2⚙️)</button>
+        <button class="btn warning" id="researchBtn" onclick="actionResearch()">🔬 Исследование (-3⚡ / +3🔬)</button>
+        <button class="btn" id="repairBtn" onclick="actionRepair()">🔧 Обслужить базу (-2⚙️ / +4⚡)</button>
+        <button class="btn danger" id="nextDayBtn" onclick="actionNextDay()">📆 Следующий день (-3⚡ -4🌬)</button>
+    </div>
+
+    <!-- ЖУРНАЛ СОБЫТИЙ -->
+    <div class="event-log" id="eventLog">🚀 База готова. Начните развитие!</div>
+
+    <!-- СБРОС -->
+    <button class="btn reset-btn" onclick="resetGame()">🔄 Начать миссию заново</button>
+    <div id="gameOverMsg" class="game-over-msg"></div>
+</div>
+
+<script>
+    // ---------- СОСТОЯНИЕ ИГРЫ ----------
+    let energy = 15;
+    let oxygen = 15;
+    let metal = 8;
+    let science = 0;
+    let day = 1;
+    let gameOver = false;
+
+    // Уровни улучшений
+    let solarLevel = 0;      // каждый уровень +1 к энергии от "Следующий день" (смягчение)
+    let oxygenEff = 0;       // каждый уровень -0.5 к потере кислорода
+
+    // Случайные события
+    const events = [
+        { name: "Пылевая буря", effect: () => { if(!gameOver) { energy = Math.max(0, energy - 3); metal = Math.max(0, metal - 2); return "🌪️ Пылевая буря! -3⚡ -2⚙️"; } } },
+        { name: "Находка руды", effect: () => { if(!gameOver) { metal += 5; return "💎 Нашли богатую жилу! +5⚙️"; } } },
+        { name: "Поломка дрона", effect: () => { if(!gameOver) { energy = Math.max(0, energy - 2); return "🤖 Дрон сломался, -2⚡ на ремонт"; } } },
+        { name: "Солнечный день", effect: () => { if(!gameOver) { energy += 4; return "☀️ Идеальная погода! +4⚡"; } } },
+        { name: "Утечка кислорода", effect: () => { if(!gameOver) { oxygen = Math.max(0, oxygen - 4); return "💨 Утечка в отсеке! -4🌬"; } } },
+        { name: "Метеорит", effect: () => { if(!gameOver) { metal += 8; energy = Math.max(0, energy - 1); return "☄️ Метеорит принёс металл! +8⚙️ -1⚡"; } } }
+    ];
+
+    // DOM элементы
+    const energyEl = document.getElementById('energyVal');
+    const oxygenEl = document.getElementById('oxygenVal');
+    const metalEl = document.getElementById('metalVal');
+    const scienceEl = document.getElementById('scienceVal');
+    const dayEl = document.getElementById('dayDisplay');
+    const eventLog = document.getElementById('eventLog');
+    const gameOverMsg = document.getElementById('gameOverMsg');
+    const solarLvlEl = document.getElementById('solarLvl');
+    const oxyLvlEl = document.getElementById('oxyLvl');
+
+    // ---------- ОБНОВЛЕНИЕ UI ----------
+    function updateUI(message) {
+        energyEl.textContent = Math.floor(energy);
+        oxygenEl.textContent = Math.floor(oxygen);
+        metalEl.textContent = Math.floor(metal);
+        scienceEl.textContent = Math.floor(science);
+        dayEl.textContent = `День ${day}`;
+        solarLvlEl.textContent = solarLevel;
+        oxyLvlEl.textContent = oxygenEff;
+        
+        if (message) eventLog.innerHTML = message;
+
+        // Проверка поражения
+        if (!gameOver && (energy <= 0 || oxygen <= 0)) {
+            gameOver = true;
+            let reason = energy <= 0 ? "Энергия исчерпана. Колония замерзла." : "Кислород кончился. Миссия провалена.";
+            gameOverMsg.innerHTML = `💀 ${reason}`;
+            eventLog.innerHTML = "Игра окончена. Нажмите 'Начать заново'.";
+        }
+
+        // Блокировка кнопок
+        const btns = ['mineBtn', 'farmBtn', 'researchBtn', 'repairBtn', 'nextDayBtn', 'upgradeSolarBtn', 'upgradeOxyBtn'];
+        btns.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.disabled = gameOver;
+        });
+    }
+
+    // Проверка стоимости
+    function canAfford(eCost, oCost, mCost, sCost = 0) {
+        if (gameOver) return false;
+        if (energy < eCost) { eventLog.innerHTML = "❌ Недостаточно энергии!"; return false; }
+        if (oxygen < oCost) { eventLog.innerHTML = "❌ Недостаточно кислорода!"; return false; }
+        if (metal < mCost) { eventLog.innerHTML = "❌ Недостаточно металла!"; return false; }
+        if (science < sCost) { eventLog.innerHTML = "❌ Недостаточно науки!"; return false; }
+        return true;
+    }
+
+    // ---------- ДЕЙСТВИЯ ----------
+    function actionMine() {
+        if (!canAfford(2, 0, 0)) return;
+        energy -= 2;
+        metal += 3;
+        updateUI("⛏ Добыто 3 металла. -2 энергии.");
+    }
+
+    function actionFarm() {
+        if (!canAfford(1, 0, 0)) return;
+        energy -= 1;
+        oxygen += 2;
+        metal += 2;
+        updateUI("🌱 Ферма дала +2🌬 и +2⚙️. -1⚡.");
+    }
+
+    function actionResearch() {
+        if (!canAfford(3, 0, 0)) return;
+        energy -= 3;
+        science += 3;
+        updateUI("🔬 Проведены исследования! +3🔬. -3⚡.");
+    }
+
+    function actionRepair() {
+        if (!canAfford(0, 0, 2)) return;
+        metal -= 2;
+        energy += 4;
+        updateUI("🔧 База обслужена. +4⚡. -2⚙️.");
+    }
+
+    function actionNextDay() {
+        if (gameOver) return;
+
+        // Базовые затраты с учётом улучшений
+        let energyCost = Math.max(1, 3 - solarLevel);
+        let oxygenCost = Math.max(2, 4 - Math.floor(oxygenEff / 2));
+        
+        energy = Math.max(0, energy - energyCost);
+        oxygen = Math.max(0, oxygen - oxygenCost);
+        day++;
+        
+        let msg = `📆 День ${day}. Потрачено ${energyCost}⚡ и ${oxygenCost}🌬.`;
+
+        // СЛУЧАЙНОЕ СОБЫТИЕ (шанс 40%)
+        if (!gameOver && Math.random() < 0.4) {
+            const evt = events[Math.floor(Math.random() * events.length)];
+            const evtMsg = evt.effect();
+            if (evtMsg) msg += ` ${evtMsg}`;
+        }
+
+        // Проверка на смерть после события
+        if (energy <= 0 || oxygen <= 0) {
+            updateUI(msg);
+        } else {
+            updateUI(msg);
+        }
+    }
+
+    // ---------- УЛУЧШЕНИЯ ----------
+    function upgradeSolar() {
+        if (!canAfford(0, 0, 10, 5)) return;
+        metal -= 10;
+        science -= 5;
+        solarLevel++;
+        updateUI(`☀️ Солнечные панели улучшены до уровня ${solarLevel}! Теперь каждый день тратится на 1⚡ меньше.`);
+    }
+
+    function upgradeOxygen() {
+        if (!canAfford(0, 0, 8, 8)) return;
+        metal -= 8;
+        science -= 8;
+        oxygenEff++;
+        updateUI(`🌡️ Эффективность кислорода повышена до ${oxygenEff}! Потери 🌬 снижены.`);
+    }
+
+    // ---------- СБРОС ----------
+    function resetGame() {
+        energy = 15;
+        oxygen = 15;
+        metal = 8;
+        science = 0;
+        day = 1;
+        solarLevel = 0;
+        oxygenEff = 0;
+        gameOver = false;
+        gameOverMsg.innerHTML = '';
+        updateUI("🚀 Новая миссия! Развивайте базу и исследуйте Марс.");
+    }
+
+    // Инициализация
+    updateUI("🚀 База 'Элизий' онлайн. Добывайте металл и исследуйте технологии!");
+</script>
+</body>
+  </html>
