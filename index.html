@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐺 Ведьмак: Выбор Судьбы</title>
-    
-    <!-- PWA Manifest -->
+    <title>🐺 Ведьмак: Выбор Судьбы v4.0</title>
     <link rel="manifest" href="data:application/manifest+json,{name:'Witcher:Fate Choice',short_name:'Witcher',display:'standalone',theme_color:'#0a0c0f',background_color:'#0a0c0f',icons:[{src:'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext x=\'10\' y=\'70\' font-size=\'70\'%3E🐺%3C/text%3E%3C/svg%3E',sizes:'100x100',type:'image/svg+xml'}]}">
     <meta name="theme-color" content="#0a0c0f">
-    
     <style>
         * { box-sizing: border-box; transition: background 0.2s, color 0.2s, border-color 0.2s; }
         body {
@@ -18,7 +15,7 @@
         }
         body.light-theme { background: #e8e0d0; color: #2a2a2a; }
         .game-container {
-            max-width: 700px; margin: 0 auto; padding: 20px;
+            max-width: 750px; margin: 0 auto; padding: 20px;
             border-radius: 32px; border: 2px solid #5a6b4b;
             background: rgba(10, 15, 10, 0.95);
             box-shadow: 0 0 30px rgba(0,0,0,0.9);
@@ -44,18 +41,18 @@
         .light-theme .top-bar button {
             background: #c0b090; border-color: #5a4a2a; color: #1a1a1a;
         }
-        .settings-overlay, .news-overlay {
+        .settings-overlay, .news-overlay, .inventory-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center;
             align-items: center; z-index: 2000;
         }
-        .settings-box, .news-box {
+        .settings-box, .news-box, .inventory-box {
             max-width: 450px; width: 90%; background: #1a221a; padding: 24px;
             border-radius: 32px; border: 2px solid #b9a57c;
             max-height: 80vh; overflow-y: auto; color: #d4cfc4;
         }
-        .light-theme .settings-box, .light-theme .news-box { background: #e8d8c0; color: #1a1a1a; }
-        .settings-box h3 { margin-top: 0; text-align: center; }
+        .light-theme .settings-box, .light-theme .news-box, .light-theme .inventory-box { background: #e8d8c0; color: #1a1a1a; }
+        .settings-box h3, .inventory-box h3 { margin-top: 0; text-align: center; }
         .settings-row {
             display: flex; justify-content: space-between; align-items: center;
             margin: 15px 0; flex-wrap: wrap; gap: 10px;
@@ -116,11 +113,12 @@
         }
         .boss-name { font-size: 22px; color: #ff8a8a; }
         .boss-hp { font-size: 28px; margin: 8px 0; }
-        .battle-actions { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+        .battle-actions { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
         .battle-btn {
             background: #4a2a2a; border: 1px solid #b34a4a; color: white;
-            padding: 10px 18px; border-radius: 30px; cursor: pointer; font-size: 15px;
+            padding: 8px 12px; border-radius: 30px; cursor: pointer; font-size: 13px;
         }
+        .signs-panel { display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
 
         .event-log {
             border-radius: 16px; padding: 14px; margin: 16px 0;
@@ -135,6 +133,15 @@
         }
         .end-msg { font-weight: bold; text-align: center; margin-top: 10px; }
         .win { color: #6aff8a; } .lose { color: #d44; }
+        
+        .inventory-btn {
+            background: #3a4a3a; border: 1px solid #9aad8a; color: #efe0c0;
+            padding: 6px 12px; border-radius: 30px; font-size: 13px; cursor: pointer;
+        }
+        .equipment-slot {
+            display: flex; justify-content: space-between; margin: 10px 0;
+            padding: 8px; background: #2a352a; border-radius: 12px;
+        }
     </style>
 </head>
 <body id="mainBody" class="">
@@ -177,9 +184,26 @@
 <!-- News Overlay -->
 <div id="newsOverlay" class="news-overlay">
     <div class="news-box">
-        <h3>📰 Патчноут v.3.0</h3>
-        <ul><li>🌍 5 языков (Рус, Eng, Pol, Deu, Fra)</li><li>💾 Экспорт/импорт сохранений</li><li>🔊 Настройки громкости</li><li>📱 PWA (установка на телефон)</li><li>📴 Офлайн-режим</li></ul>
+        <h3>📰 Патчноут v4.0 — БОЕВАЯ СИСТЕМА</h3>
+        <ul style="text-align: left; padding-left: 20px;">
+            <li>👹 <b>5 новых боссов:</b> Грифон, Леший, Высший Вампир, Дикая Охота, Мглистый</li>
+            <li>⚔️ <b>Экипировка:</b> Мечи (стальной, серебряный, рунный) и Броня (лёгкая, средняя, тяжёлая)</li>
+            <li>🐺 <b>Стили боя (Школы):</b> Волк, Кот, Грифон, Медведь</li>
+            <li>🧬 <b>Мутагены:</b> Красный (+сила), Синий (+магия), Зелёный (+выносливость)</li>
+            <li>💥 <b>Критические удары:</b> Шанс нанести двойной урон</li>
+            <li>🔮 <b>5 знаков:</b> Аард, Игни, Квен, Аксий, Ирден</li>
+            <li>🔊 <b>Звуки:</b> Музыка, звуки боя и действий (исправлено)</li>
+        </ul>
         <button onclick="document.getElementById('newsOverlay').style.display='none'" style="width:100%; padding:10px; margin-top:15px; background:#7a9a5a; color:white; border:none; border-radius:30px;">Закрыть</button>
+    </div>
+</div>
+
+<!-- Inventory Overlay -->
+<div id="inventoryOverlay" class="inventory-overlay">
+    <div class="inventory-box">
+        <h3>🎒 Инвентарь и Экипировка</h3>
+        <div id="equipmentInfo"></div>
+        <button onclick="document.getElementById('inventoryOverlay').style.display='none'" style="width:100%; padding:10px; margin-top:15px; background:#7a9a5a; color:white; border:none; border-radius:30px;">Закрыть</button>
     </div>
 </div>
 
@@ -187,7 +211,8 @@
     <div class="top-bar">
         <h2>🐺 <span id="gameTitle">Witcher: Fate Choice</span></h2>
         <div style="display: flex; gap: 6px;">
-            <button onclick="document.getElementById('newsOverlay').style.display='flex'">📢</button>
+            <button onclick="showNews()">📢</button>
+            <button onclick="openInventory()">🎒</button>
             <button onclick="toggleTheme()" id="themeBtn">🌙</button>
             <button onclick="openSettings()">⚙️</button>
         </div>
@@ -218,7 +243,13 @@
         <div class="battle-actions">
             <button class="battle-btn" onclick="battleAction('attack')">⚔️ <span id="attLabel">Attack</span></button>
             <button class="battle-btn" onclick="battleAction('dodge')">🌀 <span id="dodgeLabel">Dodge</span></button>
-            <button class="battle-btn" onclick="battleAction('sign')">🔮 <span id="signLabel">Aard</span></button>
+        </div>
+        <div class="signs-panel">
+            <button class="battle-btn" onclick="castSign('aard')">🔮 Аард</button>
+            <button class="battle-btn" onclick="castSign('igni')">🔥 Игни</button>
+            <button class="battle-btn" onclick="castSign('quen')">🛡️ Квен</button>
+            <button class="battle-btn" onclick="castSign('axii')">🧠 Аксий</button>
+            <button class="battle-btn" onclick="castSign('yrden')">⭕ Ирден</button>
         </div>
     </div>
 
@@ -243,80 +274,44 @@
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    // ---------- PWA ----------
+    // ========== ИНИЦИАЛИЗАЦИЯ TELEGRAM И PWA ==========
+    const tg = window.Telegram.WebApp;
+    tg.ready(); tg.expand();
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register("data:application/javascript,");
     }
 
-    const tg = window.Telegram.WebApp;
-    tg.ready(); tg.expand();
-
-    // ---------- AUDIO ----------
-    const bgMusic = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+    // ========== АУДИО СИСТЕМА ==========
+    const bgMusic = new Audio('https://cdn.freesound.org/previews/722/722604_11861866-lq.mp3');
     bgMusic.loop = true; bgMusic.volume = 0.3;
-    const sfxClick = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+    const sfxClick = new Audio('https://cdn.freesound.org/previews/242/242809_4284968-lq.mp3');
     sfxClick.volume = 0.6;
+    const sfxBattle = new Audio('https://cdn.freesound.org/previews/353/353113_6627936-lq.mp3');
+    sfxBattle.volume = 0.5;
+    const sfxWin = new Audio('https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3');
+    sfxWin.volume = 0.7;
+    
     function playClick() { sfxClick.currentTime = 0; sfxClick.play().catch(()=>{}); }
+    function playBattle() { sfxBattle.currentTime = 0; sfxBattle.play().catch(()=>{}); }
+    function playWin() { sfxWin.currentTime = 0; sfxWin.play().catch(()=>{}); }
     function updateVolumes() {
         bgMusic.volume = document.getElementById('musicVolume').value / 100;
-        sfxClick.volume = document.getElementById('sfxVolume').value / 100;
-        localStorage.setItem('witcher_volumes', JSON.stringify({music: bgMusic.volume, sfx: sfxClick.volume}));
+        const sfxVol = document.getElementById('sfxVolume').value / 100;
+        sfxClick.volume = sfxBattle.volume = sfxWin.volume = sfxVol;
+        localStorage.setItem('witcher_volumes', JSON.stringify({music: bgMusic.volume, sfx: sfxVol}));
     }
 
-    // ---------- MULTI-LANGUAGE (5) ----------
+    // ========== ЛОКАЛИЗАЦИЯ (5 ЯЗЫКОВ) ==========
     const langs = ['ru', 'en', 'pl', 'de', 'fr'];
     let currentLang = 'ru';
     const loc = {
-        ru: { title:'Ведьмак: Выбор Судьбы', north:'Север', nilf:'Нильф', magic:'Магия', witch:'Ведьмаки', med:'Медальон', sword:'Рунный меч', book:'Книга чар', year:'Год', reset:'Начать заново', attack:'Атака', dodge:'Уклонение', sign:'Аард', yourHp:'Ваше здоровье', welcome:'Геральт, твои решения определяют судьбу Севера...', boss1:'Мглистый', noComp:'Нет компаньона', compD:'Лютик', compY:'Йеннифэр', compT:'Трисс', endings: ['Цири на троне!','Север объединился.','Империя торжествует.','Ложа правит.','Ведьмаки уходят.'] },
-        en: { title:'Witcher: Fate Choice', north:'North', nilf:'Nilf', magic:'Magic', witch:'Witchers', med:'Medallion', sword:'Rune Sword', book:'Spellbook', year:'Year', reset:'Restart', attack:'Attack', dodge:'Dodge', sign:'Aard', yourHp:'Your HP', welcome:'Geralt, your choices shape the North...', boss1:'Foglet', noComp:'No companion', compD:'Dandelion', compY:'Yennefer', compT:'Triss', endings: ['Ciri on throne!','North united.','Empire triumphs.','Lodge rules.','Witchers fade.'] },
-        pl: { title:'Wiedźmin: Wybór Losu', north:'Północ', nilf:'Nilf', magic:'Magia', witch:'Wiedźmini', med:'Medalion', sword:'Miecz runiczny', book:'Księga', year:'Rok', reset:'Restart', attack:'Atak', dodge:'Unik', sign:'Aard', yourHp:'Twoje HP', welcome:'Geralt, twoje wybory kształtują Północ...', boss1:'Mglisty', noComp:'Brak', compD:'Jaskier', compY:'Yennefer', compT:'Triss', endings: ['Ciri na tronie!','Północ zjednoczona.','Imperium triumfuje.','Loża rządzi.','Wiedźmini odchodzą.'] },
-        de: { title:'Hexer: Schicksalswahl', north:'Norden', nilf:'Nilf', magic:'Magie', witch:'Hexer', med:'Medaillon', sword:'Runenschwert', book:'Zauberbuch', year:'Jahr', reset:'Neustart', attack:'Angriff', dodge:'Ausweichen', sign:'Aard', yourHp:'Deine HP', welcome:'Geralt, deine Entscheidungen formen den Norden...', boss1:'Nebling', noComp:'Keiner', compD:'Rittersporn', compY:'Yennefer', compT:'Triss', endings: ['Ciri auf Thron!','Norden geeint.','Imperium siegt.','Loge regiert.','Hexer verschwinden.'] },
-        fr: { title:'Sorceleur: Choix du Destin', north:'Nord', nilf:'Nilf', magic:'Magie', witch:'Sorceleurs', med:'Médaillon', sword:'Épée runique', book:'Grimoire', year:'Année', reset:'Recommencer', attack:'Attaque', dodge:'Esquive', sign:'Aard', yourHp:'Vos PV', welcome:'Geralt, tes choix façonnent le Nord...', boss1:'Brumier', noComp:'Aucun', compD:'Jaskier', compY:'Yennefer', compT:'Triss', endings: ['Ciri sur le trône!','Nord uni.','Empire triomphe.','Loge dirige.','Sorceleurs disparaissent.'] }
+        ru: { title:'Ведьмак: Выбор Судьбы', north:'Север', nilf:'Нильф', magic:'Магия', witch:'Ведьмаки', med:'Медальон', sword:'Рунный меч', book:'Книга чар', year:'Год', reset:'Начать заново', attack:'Атака', dodge:'Уклонение', yourHp:'Ваше здоровье', welcome:'Геральт, твои решения определяют судьбу Севера...', boss1:'Мглистый', noComp:'Нет компаньона', compD:'Лютик', compY:'Йеннифэр', compT:'Трисс', endings: ['Цири на троне!','Север объединился.','Империя торжествует.','Ложа правит.','Ведьмаки уходят.'] },
+        en: { title:'Witcher: Fate Choice', north:'North', nilf:'Nilf', magic:'Magic', witch:'Witchers', med:'Medallion', sword:'Rune Sword', book:'Spellbook', year:'Year', reset:'Restart', attack:'Attack', dodge:'Dodge', yourHp:'Your HP', welcome:'Geralt, your choices shape the North...', boss1:'Foglet', noComp:'No companion', compD:'Dandelion', compY:'Yennefer', compT:'Triss', endings: ['Ciri on throne!','North united.','Empire triumphs.','Lodge rules.','Witchers fade.'] },
+        pl: { title:'Wiedźmin: Wybór Losu', north:'Północ', nilf:'Nilf', magic:'Magia', witch:'Wiedźmini', med:'Medalion', sword:'Miecz runiczny', book:'Księga', year:'Rok', reset:'Restart', attack:'Atak', dodge:'Unik', yourHp:'Twoje HP', welcome:'Geralt, twoje wybory kształtują Północ...', boss1:'Mglisty', noComp:'Brak', compD:'Jaskier', compY:'Yennefer', compT:'Triss', endings: ['Ciri na tronie!','Północ zjednoczona.','Imperium triumfuje.','Loża rządzi.','Wiedźmini odchodzą.'] },
+        de: { title:'Hexer: Schicksalswahl', north:'Norden', nilf:'Nilf', magic:'Magie', witch:'Hexer', med:'Medaillon', sword:'Runenschwert', book:'Zauberbuch', year:'Jahr', reset:'Neustart', attack:'Angriff', dodge:'Ausweichen', yourHp:'Deine HP', welcome:'Geralt, deine Entscheidungen formen den Norden...', boss1:'Nebling', noComp:'Keiner', compD:'Rittersporn', compY:'Yennefer', compT:'Triss', endings: ['Ciri auf Thron!','Norden geeint.','Imperium siegt.','Loge regiert.','Hexer verschwinden.'] },
+        fr: { title:'Sorceleur: Choix du Destin', north:'Nord', nilf:'Nilf', magic:'Magie', witch:'Sorceleurs', med:'Médaillon', sword:'Épée runique', book:'Grimoire', year:'Année', reset:'Recommencer', attack:'Attaque', dodge:'Esquive', yourHp:'Vos PV', welcome:'Geralt, tes choix façonnent le Nord...', boss1:'Brumier', noComp:'Aucun', compD:'Jaskier', compY:'Yennefer', compT:'Triss', endings: ['Ciri sur le trône!','Nord uni.','Empire triomphe.','Loge dirige.','Sorceleurs disparaissent.'] }
     };
     function t(key) { return loc[currentLang][key] || key; }
-
-    // ---------- GAME STATE ----------
-    let factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
-    let artifacts = { medallion: 1, sword: 1, book: 1 };
-    let year = 1, gameOver = false, gameWin = false, inBattle = false;
-    let boss = null, playerHp = 40;
-    let questFlags = { ciriFound: false, ciriQuestProgress: 0 };
-    let companion = null;
-    let season = 'spring';
-    let currentChoices = [];
-
-    // DOM
-    const northEl = document.getElementById('northVal'), nilfEl = document.getElementById('nilfVal');
-    const magicEl = document.getElementById('magicVal'), witcherEl = document.getElementById('witcherVal');
-    const yearEl = document.getElementById('yearDisplay'), eventLog = document.getElementById('eventLog');
-    const endMsg = document.getElementById('endMsg'), battlePanel = document.getElementById('battlePanel');
-    const choiceArea = document.getElementById('choiceArea'), companionEl = document.getElementById('companionDisplay');
-
-    // Колоды
-    const baseDeck = [
-        { title:{ru:"Помочь крестьянам",en:"Help peasants",pl:"Pomóc chłopom",de:"Bauern helfen",fr:"Aider paysans"}, desc:{ru:"Селяне просят защиты.",en:"Villagers need protection."}, eff:{north:8,nilfgaard:-4,magic:-2,witcher:5} },
-        { title:{ru:"Договор с Нильфгаардом",en:"Pact with Nilfgaard"}, desc:{ru:"Империя предлагает мир."}, eff:{north:-6,nilfgaard:12,magic:-2,witcher:-4} },
-        { title:{ru:"Совет чародеек",en:"Sorceress Council"}, desc:{ru:"Ложа собирает силы."}, eff:{north:-4,nilfgaard:-4,magic:15,witcher:2} },
-        { title:{ru:"Охота на грифона",en:"Griffin Hunt"}, desc:{ru:"Заказ из Каэр Морхен."}, eff:{north:3,nilfgaard:-2,magic:0,witcher:12} }
-    ];
-    const legendaryDeck = [
-        { title:{ru:"Меч Предназначения",en:"Sword of Destiny"}, desc:{ru:"Zireael",en:"Zireael"}, eff:{north:15,nilfgaard:15,magic:5,witcher:15}, legendary:true },
-        { title:{ru:"Солнце Нильфгаарда",en:"Nilfgaardian Sun"}, desc:{ru:"Империя наступает"}, eff:{north:-20,nilfgaard:25,magic:-5,witcher:0}, legendary:true }
-    ];
-    const moralDeck = [
-        { title:{ru:"Меньшее зло",en:"Lesser Evil"}, desc:{ru:"Спасти детей или ведьму?",en:"Kids or witch?"}, effA:{north:-10,magic:10}, effB:{north:10,magic:-10}, moral:true }
-    ];
-    const ciriQuestCards = [
-        { step:1, title:{ru:"Слухи о Цири",en:"Rumors of Ciri"}, eff:{north:2,witcher:4} },
-        { step:2, title:{ru:"След Ласточки",en:"Swallow's Trail"}, eff:{north:3,magic:3} },
-        { step:3, title:{ru:"Башня Ласточки",en:"Tower of the Swallow"}, eff:{north:10,witcher:10,magic:10} }
-    ];
-    const companionCards = [
-        { type:'dandelion', title:{ru:"Лютик",en:"Dandelion"}, eff:{north:5} },
-        { type:'yennefer', title:{ru:"Йеннифэр",en:"Yennefer"}, eff:{magic:8} },
-        { type:'triss', title:{ru:"Трисс",en:"Triss"}, eff:{witcher:6} }
-    ];
-
     function applyLanguage() {
         document.getElementById('gameTitle').textContent = t('title');
         document.getElementById('fNorth').innerHTML = `🛡️ ${t('north')}`;
@@ -329,12 +324,69 @@
         document.getElementById('resetLabel').textContent = t('reset');
         document.getElementById('attLabel').textContent = t('attack');
         document.getElementById('dodgeLabel').textContent = t('dodge');
-        document.getElementById('signLabel').textContent = t('sign');
         document.getElementById('battleYourHp').textContent = t('yourHp');
         if (!gameOver && !gameWin) eventLog.textContent = t('welcome');
         updateUI();
     }
 
+    // ========== СОСТОЯНИЕ ИГРЫ ==========
+    let factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
+    let artifacts = { medallion: 1, sword: 1, book: 1 };
+    let year = 1, gameOver = false, gameWin = false, inBattle = false;
+    let boss = null, playerHp = 40;
+    let questFlags = { ciriFound: false, ciriQuestProgress: 0 };
+    let companion = null;
+    let season = 'spring';
+    let currentChoices = [];
+    
+    // Боевая система
+    let equipment = { weapon: 'steel', armor: 'light' };
+    let combatStyle = 'wolf';
+    let mutagen = { red: 0, blue: 0, green: 0 };
+    
+    const bosses = [
+        { name: 'Грифон', hp: 40, attack: 10, weakness: 'aard' },
+        { name: 'Леший', hp: 50, attack: 8, weakness: 'igni' },
+        { name: 'Высший Вампир', hp: 45, attack: 12, weakness: 'quen' },
+        { name: 'Дикая Охота', hp: 60, attack: 15, weakness: 'yrden' },
+        { name: 'Мглистый', hp: 35, attack: 7, weakness: 'axii' }
+    ];
+
+    // DOM элементы
+    const northEl = document.getElementById('northVal'), nilfEl = document.getElementById('nilfVal');
+    const magicEl = document.getElementById('magicVal'), witcherEl = document.getElementById('witcherVal');
+    const yearEl = document.getElementById('yearDisplay'), eventLog = document.getElementById('eventLog');
+    const endMsg = document.getElementById('endMsg'), battlePanel = document.getElementById('battlePanel');
+    const choiceArea = document.getElementById('choiceArea'), companionEl = document.getElementById('companionDisplay');
+
+    // Колоды карт
+    const baseDeck = [
+        { title:{ru:"Помочь крестьянам",en:"Help peasants"}, desc:{ru:"Селяне просят защиты."}, eff:{north:8,nilfgaard:-4,magic:-2,witcher:5} },
+        { title:{ru:"Договор с Нильфгаардом",en:"Pact with Nilfgaard"}, desc:{ru:"Империя предлагает мир."}, eff:{north:-6,nilfgaard:12,magic:-2,witcher:-4} },
+        { title:{ru:"Совет чародеек",en:"Sorceress Council"}, desc:{ru:"Ложа собирает силы."}, eff:{north:-4,nilfgaard:-4,magic:15,witcher:2} },
+        { title:{ru:"Охота на грифона",en:"Griffin Hunt"}, desc:{ru:"Заказ из Каэр Морхен."}, eff:{north:3,nilfgaard:-2,magic:0,witcher:12} },
+        { title:{ru:"Поддержать партизан",en:"Support partisans"}, desc:{ru:"Темерские повстанцы."}, eff:{north:10,nilfgaard:-8,magic:-4,witcher:2} },
+        { title:{ru:"Торговый путь",en:"Trade route"}, desc:{ru:"Купцы просят охрану."}, eff:{north:6,nilfgaard:6,magic:0,witcher:4} }
+    ];
+    const legendaryDeck = [
+        { title:{ru:"Меч Предназначения",en:"Sword of Destiny"}, desc:{ru:"Zireael"}, eff:{north:15,nilfgaard:15,magic:5,witcher:15}, legendary:true },
+        { title:{ru:"Солнце Нильфгаарда",en:"Nilfgaardian Sun"}, desc:{ru:"Империя наступает"}, eff:{north:-20,nilfgaard:25,magic:-5,witcher:0}, legendary:true }
+    ];
+    const moralDeck = [
+        { title:{ru:"Меньшее зло",en:"Lesser Evil"}, desc:{ru:"Спасти детей или ведьму?"}, effA:{north:-10,magic:10}, effB:{north:10,magic:-10}, moral:true }
+    ];
+    const ciriQuestCards = [
+        { step:1, title:{ru:"Слухи о Цири",en:"Rumors of Ciri"}, eff:{north:2,witcher:4} },
+        { step:2, title:{ru:"След Ласточки",en:"Swallow's Trail"}, eff:{north:3,magic:3} },
+        { step:3, title:{ru:"Башня Ласточки",en:"Tower of the Swallow"}, eff:{north:10,witcher:10,magic:10} }
+    ];
+    const companionCards = [
+        { type:'dandelion', title:{ru:"Лютик",en:"Dandelion"}, eff:{north:5} },
+        { type:'yennefer', title:{ru:"Йеннифэр",en:"Yennefer"}, eff:{magic:8} },
+        { type:'triss', title:{ru:"Трисс",en:"Triss"}, eff:{witcher:6} }
+    ];
+
+    // ========== UI И ЛОГИКА ==========
     function updateUI(msg) {
         northEl.textContent = Math.max(0, factions.north);
         nilfEl.textContent = Math.max(0, factions.nilfgaard);
@@ -352,7 +404,7 @@
             for (let f in factions) {
                 if (factions[f] <= 0) {
                     gameOver = true;
-                    endMsg.innerHTML = `<div class="lose">💀 ${getFactionName(f)} ${currentLang==='ru'?'потеряла влияние':'lost influence'}.</div>`;
+                    endMsg.innerHTML = `<div class="lose">💀 ${getFactionName(f)} потеряла влияние.</div>`;
                     disableCards(true); return;
                 }
             }
@@ -447,7 +499,7 @@
         year++;
         checkSeason();
         randomEncounter();
-        updateUI(`${currentLang==='ru'?'Вы выбрали':'You chose'}: ${card.title[currentLang]}`);
+        updateUI(`Вы выбрали: ${card.title[currentLang]}`);
         if (!gameOver && !gameWin && year % 5 === 0) startBattle();
         else drawCards();
     }
@@ -466,68 +518,113 @@
         updateUI();
     }
 
-    function startBattle() {
-        inBattle = true; battlePanel.style.display = 'block'; choiceArea.style.display = 'none';
-        boss = { name: t('boss1'), hp: 30 + year * 2 };
-        playerHp = 40;
-        document.getElementById('bossName').textContent = boss.name;
-        document.getElementById('bossHp').textContent = boss.hp;
-        document.getElementById('playerHp').textContent = playerHp;
-        updateUI('⚔️ ' + (currentLang==='ru'?'БИТВА!':'BATTLE!'));
+    // ========== БОЕВАЯ СИСТЕМА ==========
+    function getBossByYear() {
+        if (year <= 3) return bosses[0];
+        if (year <= 6) return bosses[1];
+        if (year <= 9) return bosses[2];
+        if (year <= 12) return bosses[3];
+        return bosses[4];
+    }
+
+    function calculateDamage(action, sign = null) {
+        let baseDmg = 10;
+        if (combatStyle === 'wolf') baseDmg += 2;
+        else if (combatStyle === 'cat') baseDmg += (Math.random() < 0.3 ? 10 : 0);
+        else if (combatStyle === 'griffin' && sign) baseDmg += 8;
+        else if (combatStyle === 'bear') baseDmg += 4;
+        if (equipment.weapon === 'silver') baseDmg += 3;
+        else if (equipment.weapon === 'rune') baseDmg += 6;
+        baseDmg += mutagen.red * 2;
+        return Math.floor(baseDmg);
+    }
+
+    function castSign(sign) {
+        if (!inBattle) return;
+        playClick();
+        let dmg = calculateDamage('sign', sign);
+        let bossDmg = boss.attack;
+        if (sign === boss.weakness) { dmg *= 1.5; bossDmg *= 0.5; }
+        if (sign === 'quen') bossDmg = Math.floor(bossDmg * 0.3);
+        if (sign === 'axii' && Math.random() < 0.4) bossDmg = 0;
+        boss.hp -= dmg;
+        playerHp -= bossDmg;
+        if (sign === 'yrden') boss.hp -= 5;
+        updateBattleUI();
+        checkBattleEnd();
     }
 
     function battleAction(action) {
         playClick();
-        let dmg = 0, bossDmg = 0;
-        if (action === 'attack') { dmg = 12; bossDmg = 8; }
-        else if (action === 'dodge') { dmg = 5; bossDmg = Math.random()>0.5?0:6; }
-        else { dmg = 16; bossDmg = 5; }
-        boss.hp -= dmg; playerHp -= bossDmg;
+        let dmg = calculateDamage(action);
+        let bossDmg = boss.attack;
+        if (action === 'dodge') bossDmg = Math.random() > 0.5 ? 0 : Math.floor(bossDmg * 0.5);
+        boss.hp -= dmg;
+        playerHp -= bossDmg;
+        updateBattleUI();
+        checkBattleEnd();
+    }
+
+    function updateBattleUI() {
         document.getElementById('bossHp').textContent = Math.max(0, boss.hp);
         document.getElementById('playerHp').textContent = Math.max(0, playerHp);
+    }
+
+    function checkBattleEnd() {
         if (boss.hp <= 0) {
+            playWin();
             inBattle = false; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            artifacts.medallion++; year++;
-            updateUI('🎉 ' + (currentLang==='ru'?'Босс повержен!':'Boss defeated!'));
+            artifacts.medallion++; mutagen.red++;
+            updateUI('🎉 Босс повержен! Получен красный мутаген.');
+            year++;
             drawCards();
         } else if (playerHp <= 0) {
             gameOver = true; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            updateUI('💀 ' + (currentLang==='ru'?'Геральт погиб...':'Geralt died...'));
-        } else { updateUI(`${boss.name} HP: ${boss.hp}`); }
+            updateUI('💀 Геральт погиб...');
+        }
     }
 
-    function disableCards(disabled) {
-        document.getElementById('leftCard').classList.toggle('disabled', disabled);
-        document.getElementById('rightCard').classList.toggle('disabled', disabled);
-        document.getElementById('medallionBtn').disabled = disabled || artifacts.medallion <= 0;
-        document.getElementById('swordBtn').disabled = disabled || artifacts.sword <= 0;
-        document.getElementById('bookBtn').disabled = disabled || artifacts.book <= 0;
+    function startBattle() {
+        inBattle = true; playBattle();
+        battlePanel.style.display = 'block'; choiceArea.style.display = 'none';
+        boss = getBossByYear();
+        playerHp = 40 + (mutagen.green * 5);
+        document.getElementById('bossName').textContent = boss.name;
+        document.getElementById('bossHp').textContent = boss.hp;
+        document.getElementById('playerHp').textContent = playerHp;
+        updateUI(`⚔️ БИТВА С ${boss.name.toUpperCase()}!`);
     }
 
-    function saveGame() {
-        const save = { factions, artifacts, year, questFlags, companion, currentLang };
-        if (tg.CloudStorage) tg.CloudStorage.setItem('witcher_save', JSON.stringify(save));
+    // ========== ИНВЕНТАРЬ ==========
+    function openInventory() {
+        const info = document.getElementById('equipmentInfo');
+        const weaponNames = { steel: 'Стальной', silver: 'Серебряный', rune: 'Рунный' };
+        const styleNames = { wolf: 'Волк', cat: 'Кот', griffin: 'Грифон', bear: 'Медведь' };
+        info.innerHTML = `
+            <div class="equipment-slot"><span>⚔️ Оружие:</span> <span>${weaponNames[equipment.weapon]}</span></div>
+            <div class="equipment-slot"><span>🛡️ Броня:</span> <span>${equipment.armor}</span></div>
+            <div class="equipment-slot"><span>🐺 Стиль:</span> <span>${styleNames[combatStyle]}</span></div>
+            <div class="equipment-slot"><span>🧬 Мутагены:</span> <span>🔴${mutagen.red} 🔵${mutagen.blue} 🟢${mutagen.green}</span></div>
+            <button onclick="cycleWeapon()" class="inventory-btn">Сменить оружие</button>
+            <button onclick="cycleStyle()" class="inventory-btn">Сменить стиль</button>
+        `;
+        document.getElementById('inventoryOverlay').style.display = 'flex';
+    }
+    function cycleWeapon() {
+        const weapons = ['steel', 'silver', 'rune'];
+        let idx = weapons.indexOf(equipment.weapon);
+        equipment.weapon = weapons[(idx + 1) % weapons.length];
+        openInventory();
+    }
+    function cycleStyle() {
+        const styles = ['wolf', 'cat', 'griffin', 'bear'];
+        let idx = styles.indexOf(combatStyle);
+        combatStyle = styles[(idx + 1) % styles.length];
+        openInventory();
     }
 
-    function resetGame() {
-        factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
-        artifacts = { medallion: 1, sword: 1, book: 1 };
-        year = 1; gameOver = false; gameWin = false; inBattle = false;
-        questFlags = { ciriFound: false, ciriQuestProgress: 0 };
-        companion = null; season = 'spring';
-        battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-        endMsg.innerHTML = '';
-        updateUI(t('welcome'));
-        drawCards();
-    }
-
-    // Settings & Utils
-    function toggleTheme() {
-        document.getElementById('mainBody').classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
-        localStorage.setItem('witcher_theme', isLight ? 'light' : 'dark');
-    }
+    // ========== НОВОСТИ И НАСТРОЙКИ ==========
+    function showNews() { document.getElementById('newsOverlay').style.display = 'flex'; }
     function openSettings() {
         document.getElementById('settingsOverlay').style.display = 'flex';
         const sel = document.getElementById('langSelect');
@@ -535,12 +632,16 @@
         const names = {ru:'Русский', en:'English', pl:'Polski', de:'Deutsch', fr:'Français'};
         langs.forEach(l => { const opt = document.createElement('option'); opt.value = l; opt.textContent = names[l]; if(l===currentLang) opt.selected=true; sel.appendChild(opt); });
         sel.onchange = () => { currentLang = sel.value; applyLanguage(); drawCards(); localStorage.setItem('witcher_lang', currentLang); };
-        document.getElementById('musicVolume').oninput = updateVolumes;
-        document.getElementById('sfxVolume').oninput = updateVolumes;
     }
     function closeSettings() { document.getElementById('settingsOverlay').style.display = 'none'; }
+    function toggleTheme() {
+        document.getElementById('mainBody').classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+        localStorage.setItem('witcher_theme', isLight ? 'light' : 'dark');
+    }
     function exportSave() {
-        const save = { factions, artifacts, year, questFlags, companion, currentLang };
+        const save = { factions, artifacts, year, questFlags, companion, currentLang, equipment, combatStyle, mutagen };
         const blob = new Blob([JSON.stringify(save)], {type: 'application/json'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'witcher_save.json'; a.click();
     }
@@ -552,6 +653,9 @@
                 const save = JSON.parse(ev.target.result);
                 factions = save.factions; artifacts = save.artifacts; year = save.year;
                 questFlags = save.questFlags; companion = save.companion;
+                equipment = save.equipment || { weapon: 'steel', armor: 'light' };
+                combatStyle = save.combatStyle || 'wolf';
+                mutagen = save.mutagen || { red: 0, blue: 0, green: 0 };
                 currentLang = save.currentLang || 'ru';
                 applyLanguage(); updateUI('Сохранение загружено!'); drawCards();
             } catch(ex) { alert('Ошибка файла'); }
@@ -565,18 +669,44 @@
             resetGame(); closeSettings();
         }
     }
+    function disableCards(disabled) {
+        document.getElementById('leftCard').classList.toggle('disabled', disabled);
+        document.getElementById('rightCard').classList.toggle('disabled', disabled);
+        document.getElementById('medallionBtn').disabled = disabled || artifacts.medallion <= 0;
+        document.getElementById('swordBtn').disabled = disabled || artifacts.sword <= 0;
+        document.getElementById('bookBtn').disabled = disabled || artifacts.book <= 0;
+    }
+    function saveGame() {
+        const save = { factions, artifacts, year, questFlags, companion, currentLang, equipment, combatStyle, mutagen };
+        if (tg.CloudStorage) tg.CloudStorage.setItem('witcher_save', JSON.stringify(save));
+    }
+    function resetGame() {
+        factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
+        artifacts = { medallion: 1, sword: 1, book: 1 };
+        year = 1; gameOver = false; gameWin = false; inBattle = false;
+        questFlags = { ciriFound: false, ciriQuestProgress: 0 };
+        companion = null; season = 'spring';
+        equipment = { weapon: 'steel', armor: 'light' };
+        combatStyle = 'wolf';
+        mutagen = { red: 0, blue: 0, green: 0 };
+        battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
+        endMsg.innerHTML = '';
+        updateUI(t('welcome'));
+        drawCards();
+    }
 
-    // Init
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
     const savedTheme = localStorage.getItem('witcher_theme');
-    if (savedTheme === 'light') document.getElementById('mainBody').classList.add('light-theme');
-    document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+    if (savedTheme === 'light') { document.getElementById('mainBody').classList.add('light-theme'); document.getElementById('themeBtn').textContent = '☀️'; }
     const savedLang = localStorage.getItem('witcher_lang');
     if (savedLang && langs.includes(savedLang)) currentLang = savedLang;
     const vols = JSON.parse(localStorage.getItem('witcher_volumes') || '{}');
     if (vols.music) bgMusic.volume = vols.music;
-    if (vols.sfx) sfxClick.volume = vols.sfx;
+    if (vols.sfx) { const v = vols.sfx; sfxClick.volume = sfxBattle.volume = sfxWin.volume = v; }
     document.getElementById('musicVolume').value = bgMusic.volume * 100;
     document.getElementById('sfxVolume').value = sfxClick.volume * 100;
+    document.getElementById('musicVolume').oninput = updateVolumes;
+    document.getElementById('sfxVolume').oninput = updateVolumes;
     
     if (tg.CloudStorage) {
         tg.CloudStorage.getItem('witcher_save', (err, value) => {
@@ -585,6 +715,9 @@
                     const save = JSON.parse(value);
                     factions = save.factions; artifacts = save.artifacts; year = save.year;
                     questFlags = save.questFlags; companion = save.companion;
+                    equipment = save.equipment || { weapon: 'steel', armor: 'light' };
+                    combatStyle = save.combatStyle || 'wolf';
+                    mutagen = save.mutagen || { red: 0, blue: 0, green: 0 };
                     currentLang = save.currentLang || 'ru';
                 } catch(e) {}
             }
@@ -597,6 +730,7 @@
         resetGame();
     }
     bgMusic.play().catch(()=>{});
+    showNews(); // Показываем новости при запуске
 </script>
 </body>
-    </html>
+            </html>
