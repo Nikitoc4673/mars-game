@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐺 Ведьмак: Выбор Судьбы</title>
+    <title>🐺 Ведьмак: Выбор Судьбы (v.2.0)</title>
     <style>
         * { box-sizing: border-box; transition: background 0.2s, color 0.2s, border-color 0.2s; }
         body {
@@ -34,11 +34,11 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
         }
-        .theme-btn, .lang-btn, .tutorial-btn {
+        .theme-btn, .lang-btn, .tutorial-btn, .news-btn {
             background: #2a352a; border: 1px solid #7a9a5a; color: #efe0c0;
             padding: 6px 12px; border-radius: 30px; font-size: 14px; cursor: pointer;
         }
-        .light-theme .theme-btn, .light-theme .lang-btn, .light-theme .tutorial-btn {
+        .light-theme .theme-btn, .light-theme .lang-btn, .light-theme .tutorial-btn, .light-theme .news-btn {
             background: #c0b090; border-color: #5a4a2a; color: #1a1a1a;
         }
         .years-badge {
@@ -48,6 +48,13 @@
         }
         .light-theme .years-badge {
             background: #d4a090; color: #4a1a1a; border-color: #8a4a4a;
+        }
+        .companion-badge {
+            background: #4a3a2a; padding: 4px 10px; border-radius: 20px; font-size: 14px;
+            border: 1px solid #a08050; color: #ffd080;
+        }
+        .light-theme .companion-badge {
+            background: #d0b890; color: #2a1a0a;
         }
         .factions {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 15px 0;
@@ -81,15 +88,13 @@
         .light-theme .artifact-btn {
             background: #b0a080; border-color: #5a4a2a; color: #1a1a1a;
         }
+        .artifact-btn:disabled { opacity: 0.5; pointer-events: none; }
 
         .choice-area {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0;
         }
-        @media (min-width: 600px) {
-            .choice-area { grid-template-columns: repeat(2, 1fr); }
-        }
         .card {
-            border-radius: 24px; padding: 16px 10px; cursor: pointer;
+            border-radius: 24px; padding: 16px 10px; cursor: pointer; transition: 0.15s;
             text-align: center; box-shadow: 0 6px 0 #1a261a;
             background: #1a221a; border: 2px solid #7a9a5a;
             background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext x="10" y="30" font-family="Arial" font-size="20" fill="%233a5a3a" opacity="0.3"%3E🐺%3C/text%3E%3C/svg%3E');
@@ -98,6 +103,8 @@
             background: #e8d8c0; border-color: #8a7a5a;
             box-shadow: 0 6px 0 #a09070;
         }
+        .card.legendary { border: 4px solid gold !important; box-shadow: 0 0 20px gold; }
+        .card.moral { border: 3px solid #b87add !important; }
         .card:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a261a; }
         .card.disabled { opacity: 0.5; pointer-events: none; }
         .card-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
@@ -143,17 +150,18 @@
         .win { color: #6aff8a; } .lose { color: #d44; }
         .light-theme .win { color: #2a7a2a; } .light-theme .lose { color: #a03030; }
 
-        /* Туториал */
-        .tutorial-overlay {
+        /* Оверлеи */
+        .news-overlay, .tutorial-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: flex; justify-content: center;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center;
             align-items: center; z-index: 1000;
         }
-        .tutorial-box {
+        .news-box, .tutorial-box {
             max-width: 400px; background: #1a221a; padding: 24px;
-            border-radius: 32px; border: 2px solid #b9a57c; text-align: center;
+            border-radius: 32px; border: 2px solid #b9a57c; text-align: left;
+            max-height: 80vh; overflow-y: auto; color: #d4cfc4;
         }
-        .light-theme .tutorial-box { background: #e8d8c0; border-color: #5a4a2a; }
+        .light-theme .news-box, .light-theme .tutorial-box { background: #e8d8c0; color: #1a1a1a; }
         .tutorial-btn-inner {
             background: #7a9a5a; border: none; color: white; padding: 10px 20px;
             border-radius: 30px; margin: 8px; cursor: pointer;
@@ -161,7 +169,25 @@
     </style>
 </head>
 <body id="mainBody" class="">
-<div id="tutorialOverlay" class="tutorial-overlay" style="display: none;">
+
+<!-- Окно новостей -->
+<div id="newsOverlay" class="news-overlay">
+    <div class="news-box">
+        <h3>📰 Патчноут v.2.0</h3>
+        <ul style="padding-left: 20px;">
+            <li>👑 <b>Легендарные карты</b> — золотая рамка и мощные эффекты.</li>
+            <li>📜 <b>Квест "Следы Цири"</b> — соберите 3 части, чтобы изменить концовку.</li>
+            <li>🧙 <b>Компаньоны</b> — Лютик, Йеннифэр, Трисс дают постоянные бонусы.</li>
+            <li>❄️ <b>Сезоны</b> — Зима (штраф) и Весна (бонус) каждые 3 и 6 лет.</li>
+            <li>😈 <b>Дилеммы морали</b> — карты с фиолетовой рамкой, сложный выбор.</li>
+            <li>🛤️ <b>Случайные встречи</b> — в начале года можно встретить NPC.</li>
+        </ul>
+        <button class="tutorial-btn-inner" onclick="document.getElementById('newsOverlay').style.display='none'" style="margin-top: 15px; width: 100%;">Закрыть</button>
+    </div>
+</div>
+
+<!-- Окно туториала -->
+<div id="tutorialOverlay" class="tutorial-overlay">
     <div class="tutorial-box">
         <h3 id="tutTitle">🐺 Добро пожаловать, ведьмак!</h3>
         <p id="tutDesc">Выбирай карты, балансируй фракции, сражайся с боссами. Доживи до 15 года.</p>
@@ -174,14 +200,19 @@
     <div class="top-bar">
         <h2>🐺 <span id="gameTitle">Ведьмак: Выбор Судьбы</span></h2>
         <div style="display: flex; gap: 6px;">
+            <button class="news-btn" onclick="document.getElementById('newsOverlay').style.display='flex'">📢</button>
             <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Тёмная</button>
             <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">🌍 EN</button>
             <button class="tutorial-btn" onclick="startTutorial()">📖</button>
         </div>
     </div>
     
-    <div class="years-badge" id="yearDisplay">Год 1 / 15</div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="years-badge" id="yearDisplay">Год 1 / 15</div>
+        <div class="companion-badge" id="companionDisplay">🧑‍🎤 Нет компаньона</div>
+    </div>
 
+    <!-- ФРАКЦИИ -->
     <div class="factions">
         <div class="faction-card"><span class="faction-name" id="fNorth">🛡️ Север</span> <span class="faction-value north" id="northVal">50</span></div>
         <div class="faction-card"><span class="faction-name" id="fNilf">☀️ Нильф</span> <span class="faction-value nilf" id="nilfVal">50</span></div>
@@ -189,12 +220,14 @@
         <div class="faction-card"><span class="faction-name" id="fWitch">⚔️ Ведьмаки</span> <span class="faction-value witcher" id="witcherVal">50</span></div>
     </div>
 
+    <!-- АРТЕФАКТЫ -->
     <div class="artifacts-panel">
         <button class="artifact-btn" id="medallionBtn" onclick="useArtifact('medallion')">🐺 <span id="medName">Медальон</span> (<span id="medCount">1</span>)</button>
         <button class="artifact-btn" id="swordBtn" onclick="useArtifact('sword')">⚔️ <span id="swordName">Рунный меч</span> (<span id="swordCount">1</span>)</button>
         <button class="artifact-btn" id="bookBtn" onclick="useArtifact('book')">📖 <span id="bookName">Книга чар</span> (<span id="bookCount">1</span>)</button>
     </div>
 
+    <!-- ПАНЕЛЬ БОЯ -->
     <div class="battle-panel" id="battlePanel" style="display: none;">
         <div class="boss-name" id="bossName">🐉 Мглистый</div>
         <div class="boss-hp">❤️ <span id="bossHp">30</span></div>
@@ -206,6 +239,7 @@
         </div>
     </div>
 
+    <!-- КАРТЫ ВЫБОРА -->
     <div class="choice-area" id="choiceArea">
         <div class="card" id="leftCard" onclick="makeChoice(0)">
             <div class="card-title" id="leftTitle">—</div>
@@ -234,140 +268,84 @@
     let currentLang = 'ru';
     const loc = {
         ru: {
-            title: 'Ведьмак: Выбор Судьбы',
-            north: 'Север', nilf: 'Нильф', magic: 'Магия', witch: 'Ведьмаки',
-            med: 'Медальон', sword: 'Рунный меч', book: 'Книга чар',
-            year: 'Год', reset: 'Начать заново',
-            attack: 'Атака', dodge: 'Уклонение', sign: 'Аард',
-            yourHp: 'Ваше здоровье',
-            welcome: 'Геральт, твои решения определят судьбу Севера...',
-            boss1: 'Мглистый',
-            endings: [
-                'Цири на троне. Север процветает!',
-                'Север объединился. Радовид правит.',
-                'Империя торжествует. Эмгыр на троне.',
-                'Ложа Чародеек правит из тени.',
-                'Ведьмаки уходят в тень.'
-            ]
+            title: 'Ведьмак: Выбор Судьбы', north: 'Север', nilf: 'Нильф', magic: 'Магия', witch: 'Ведьмаки',
+            med: 'Медальон', sword: 'Рунный меч', book: 'Книга чар', year: 'Год', reset: 'Начать заново',
+            attack: 'Атака', dodge: 'Уклонение', sign: 'Аард', yourHp: 'Ваше здоровье',
+            welcome: 'Геральт, твои решения определят судьбу Севера...', boss1: 'Мглистый',
+            noComp: 'Нет компаньона', compD: 'Лютик', compY: 'Йеннифэр', compT: 'Трисс',
+            endings: ['Цири на троне. Север процветает!','Север объединился.','Империя торжествует.','Ложа правит.','Ведьмаки уходят.']
         },
         en: {
-            title: 'Witcher: Fate Choice',
-            north: 'North', nilf: 'Nilf', magic: 'Magic', witch: 'Witchers',
-            med: 'Medallion', sword: 'Rune Sword', book: 'Spellbook',
-            year: 'Year', reset: 'Restart',
-            attack: 'Attack', dodge: 'Dodge', sign: 'Aard',
-            yourHp: 'Your HP',
-            welcome: 'Geralt, your choices shape the North...',
-            boss1: 'Foglet',
-            endings: [
-                'Ciri on throne. North prospers!',
-                'North united. Radovid rules.',
-                'Empire triumphs. Emhyr on throne.',
-                'Lodge of Sorceresses rules.',
-                'Witchers fade into shadows.'
-            ]
+            title: 'Witcher: Fate Choice', north: 'North', nilf: 'Nilf', magic: 'Magic', witch: 'Witchers',
+            med: 'Medallion', sword: 'Rune Sword', book: 'Spellbook', year: 'Year', reset: 'Restart',
+            attack: 'Attack', dodge: 'Dodge', sign: 'Aard', yourHp: 'Your HP',
+            welcome: 'Geralt, your choices shape the North...', boss1: 'Foglet',
+            noComp: 'No companion', compD: 'Dandelion', compY: 'Yennefer', compT: 'Triss',
+            endings: ['Ciri on throne!','North united.','Empire triumphs.','Lodge rules.','Witchers fade.']
         }
     };
-
     function t(key) { return loc[currentLang][key] || key; }
 
-    function applyLanguage() {
-        document.getElementById('gameTitle').textContent = t('title');
-        document.getElementById('fNorth').innerHTML = `🛡️ ${t('north')}`;
-        document.getElementById('fNilf').innerHTML = `☀️ ${t('nilf')}`;
-        document.getElementById('fMagic').innerHTML = `🔮 ${t('magic')}`;
-        document.getElementById('fWitch').innerHTML = `⚔️ ${t('witch')}`;
-        document.getElementById('medName').textContent = t('med');
-        document.getElementById('swordName').textContent = t('sword');
-        document.getElementById('bookName').textContent = t('book');
-        document.getElementById('resetLabel').textContent = t('reset');
-        document.getElementById('attLabel').textContent = t('attack');
-        document.getElementById('dodgeLabel').textContent = t('dodge');
-        document.getElementById('signLabel').textContent = t('sign');
-        document.getElementById('battleYourHp').textContent = t('yourHp');
-        if (!gameOver && !gameWin) eventLog.textContent = t('welcome');
-        document.getElementById('yearDisplay').textContent = `${t('year')} ${year} / 15`;
-        document.getElementById('langBtn').textContent = currentLang === 'ru' ? '🌍 EN' : '🌍 RU';
-    }
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'ru' ? 'en' : 'ru';
-        applyLanguage();
-        updateUI();
-    }
-
-    // ---------- ТЕМА ----------
-    function toggleTheme() {
-        const body = document.getElementById('mainBody');
-        body.classList.toggle('light-theme');
-        const isLight = body.classList.contains('light-theme');
-        document.getElementById('themeBtn').textContent = isLight ? '☀️ Светлая' : '🌙 Тёмная';
-        localStorage.setItem('witcher_theme', isLight ? 'light' : 'dark');
-    }
-
-    // ---------- ТУТОРИАЛ ----------
-    let tutStep = 0;
-    function startTutorial() {
-        tutStep = 0;
-        document.getElementById('tutorialOverlay').style.display = 'flex';
-        updateTutorialText();
-    }
-    function nextTutorialStep() {
-        tutStep++;
-        if (tutStep >= 3) closeTutorial();
-        else updateTutorialText();
-    }
-    function updateTutorialText() {
-        const steps = [
-            { title: 'Выбор карт', desc: 'Каждый ход выбирайте одну из двух карт. Эффекты меняют влияние фракций.' },
-            { title: 'Баланс', desc: 'Не дайте ни одной фракции упасть до 0. Иначе — поражение.' },
-            { title: 'Битвы', desc: 'Раз в 5 лет — бой с боссом. Используйте атаку, уклонение или знак.' }
-        ];
-        document.getElementById('tutTitle').textContent = steps[tutStep].title;
-        document.getElementById('tutDesc').textContent = steps[tutStep].desc;
-        document.getElementById('tutNext').textContent = tutStep === 2 ? 'Завершить' : 'Далее';
-    }
-    function closeTutorial() {
-        document.getElementById('tutorialOverlay').style.display = 'none';
-    }
-
-    // ---------- СОСТОЯНИЕ ----------
+    // ---------- ГЛОБАЛЬНОЕ СОСТОЯНИЕ ----------
     let factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
     let artifacts = { medallion: 1, sword: 1, book: 1 };
     let year = 1, gameOver = false, gameWin = false, inBattle = false;
     let boss = null, playerHp = 40;
-    let questFlags = { ciriFound: false };
-
-    const deck = [
-        { title: { ru: "Помочь крестьянам", en: "Help peasants" }, desc: { ru: "Селяне просят защиты.", en: "Villagers need protection." }, eff: { north: 8, nilfgaard: -4, magic: -2, witcher: 5 } },
-        { title: { ru: "Договор с Нильфгаардом", en: "Pact with Nilfgaard" }, desc: { ru: "Империя предлагает мир.", en: "Empire offers peace." }, eff: { north: -6, nilfgaard: 12, magic: -2, witcher: -4 } },
-        { title: { ru: "Совет чародеек", en: "Sorceress Council" }, desc: { ru: "Ложа собирает силы.", en: "Lodge gathers power." }, eff: { north: -4, nilfgaard: -4, magic: 15, witcher: 2 } },
-        { title: { ru: "Охота на грифона", en: "Griffin Hunt" }, desc: { ru: "Заказ из Каэр Морхен.", en: "Contract from Kaer Morhen." }, eff: { north: 3, nilfgaard: -2, magic: 0, witcher: 12 } },
-        { title: { ru: "Поддержать партизан", en: "Support partisans" }, desc: { ru: "Темерские повстанцы.", en: "Temerian rebels." }, eff: { north: 10, nilfgaard: -8, magic: -4, witcher: 2 } },
-        { title: { ru: "Торговый путь", en: "Trade route" }, desc: { ru: "Купцы просят охрану.", en: "Merchants need guard." }, eff: { north: 6, nilfgaard: 6, magic: 0, witcher: 4 } },
-        { title: { ru: "Проклятие Умы", en: "Uma's Curse" }, desc: { ru: "Помочь Аваллак'ху.", en: "Help Avallac'h." }, eff: { north: -2, nilfgaard: -2, magic: 10, witcher: 8 } },
-        { title: { ru: "Битва за мост", en: "Battle for the Bridge" }, desc: { ru: "Сражение с Нильфгаардом.", en: "Fight Nilfgaard." }, eff: { north: 8, nilfgaard: -12, magic: -2, witcher: 6 } }
-    ];
-
+    let questFlags = { ciriFound: false, ciriQuestProgress: 0 };
+    let companion = null; // 'dandelion', 'yennefer', 'triss'
+    let season = 'spring';
     let currentChoices = [];
 
-    // DOM
+    // DOM элементы
     const northEl = document.getElementById('northVal'), nilfEl = document.getElementById('nilfVal');
     const magicEl = document.getElementById('magicVal'), witcherEl = document.getElementById('witcherVal');
     const yearEl = document.getElementById('yearDisplay'), eventLog = document.getElementById('eventLog');
     const endMsg = document.getElementById('endMsg'), battlePanel = document.getElementById('battlePanel');
-    const choiceArea = document.getElementById('choiceArea');
+    const choiceArea = document.getElementById('choiceArea'), companionEl = document.getElementById('companionDisplay');
 
+    // ---------- КОЛОДЫ ----------
+    const baseDeck = [
+        { title: {ru:"Помочь крестьянам", en:"Help peasants"}, desc:{ru:"Селяне просят защиты.", en:"Villagers need protection."}, eff:{north:8, nilfgaard:-4, magic:-2, witcher:5} },
+        { title: {ru:"Договор с Нильфгаардом", en:"Pact with Nilfgaard"}, desc:{ru:"Империя предлагает мир.", en:"Empire offers peace."}, eff:{north:-6, nilfgaard:12, magic:-2, witcher:-4} },
+        { title: {ru:"Совет чародеек", en:"Sorceress Council"}, desc:{ru:"Ложа собирает силы.", en:"Lodge gathers power."}, eff:{north:-4, nilfgaard:-4, magic:15, witcher:2} },
+        { title: {ru:"Охота на грифона", en:"Griffin Hunt"}, desc:{ru:"Заказ из Каэр Морхен.", en:"Contract from Kaer Morhen."}, eff:{north:3, nilfgaard:-2, magic:0, witcher:12} },
+        { title: {ru:"Поддержать партизан", en:"Support partisans"}, desc:{ru:"Темерские повстанцы.", en:"Temerian rebels."}, eff:{north:10, nilfgaard:-8, magic:-4, witcher:2} },
+        { title: {ru:"Торговый путь", en:"Trade route"}, desc:{ru:"Купцы просят охрану.", en:"Merchants need guard."}, eff:{north:6, nilfgaard:6, magic:0, witcher:4} },
+        { title: {ru:"Проклятие Умы", en:"Uma's Curse"}, desc:{ru:"Помочь Аваллак'ху.", en:"Help Avallac'h."}, eff:{north:-2, nilfgaard:-2, magic:10, witcher:8} }
+    ];
+    const legendaryDeck = [
+        { title: {ru:"Меч Предназначения", en:"Sword of Destiny"}, desc:{ru:"Zireael", en:"Zireael"}, eff:{north:15, nilfgaard:15, magic:5, witcher:15}, legendary: true },
+        { title: {ru:"Солнце Нильфгаарда", en:"Nilfgaardian Sun"}, desc:{ru:"Империя наступает", en:"Empire strikes"}, eff:{north:-20, nilfgaard:25, magic:-5, witcher:0}, legendary: true }
+    ];
+    const moralDeck = [
+        { title: {ru:"Меньшее зло", en:"Lesser Evil"}, desc:{ru:"Спасти детей или ведьму?", en:"Kids or witch?"}, effA:{north:-10, magic:10}, effB:{north:10, magic:-10}, moral: true }
+    ];
+    const ciriQuestCards = [
+        { step:1, title:{ru:"Слухи о Цири", en:"Rumors of Ciri"}, desc:{ru:"Ласточка жива?", en:"Is Swallow alive?"}, eff:{north:2, witcher:4} },
+        { step:2, title:{ru:"След Ласточки", en:"Swallow's Trail"}, desc:{ru:"Она была здесь.", en:"She was here."}, eff:{north:3, magic:3} },
+        { step:3, title:{ru:"Башня Ласточки", en:"Tower of the Swallow"}, desc:{ru:"Цири найдена!", en:"Ciri found!"}, eff:{north:10, witcher:10, magic:10} }
+    ];
+    const companionCards = [
+        { type:'dandelion', title:{ru:"Лютик", en:"Dandelion"}, desc:{ru:"Бард присоединяется.", en:"Bard joins."}, eff:{north:5} },
+        { type:'yennefer', title:{ru:"Йеннифэр", en:"Yennefer"}, desc:{ru:"Чародейка в команде.", en:"Sorceress joins."}, eff:{magic:8} },
+        { type:'triss', title:{ru:"Трисс", en:"Triss"}, desc:{ru:"Трисс Меригольд.", en:"Triss Merigold."}, eff:{witcher:6} }
+    ];
+
+    // ---------- UI И ЛОГИКА ----------
     function updateUI(msg) {
-        northEl.textContent = factions.north; nilfEl.textContent = factions.nilfgaard;
-        magicEl.textContent = factions.magic; witcherEl.textContent = factions.witcher;
+        northEl.textContent = Math.max(0, factions.north);
+        nilfEl.textContent = Math.max(0, factions.nilfgaard);
+        magicEl.textContent = Math.max(0, factions.magic);
+        witcherEl.textContent = Math.max(0, factions.witcher);
         yearEl.textContent = `${t('year')} ${year} / 15`;
         if (msg) eventLog.innerHTML = msg;
+        
+        if (companion) {
+            const names = { dandelion: t('compD'), yennefer: t('compY'), triss: t('compT') };
+            companionEl.textContent = `🧑‍🎤 ${names[companion]}`;
+        } else { companionEl.textContent = `🧑‍🎤 ${t('noComp')}`; }
 
-        document.getElementById('medCount').textContent = artifacts.medallion;
-        document.getElementById('swordCount').textContent = artifacts.sword;
-        document.getElementById('bookCount').textContent = artifacts.book;
-
+        // Проверка проигрыша
         if (!gameOver && !gameWin && !inBattle) {
             for (let f in factions) {
                 if (factions[f] <= 0) {
@@ -377,11 +355,11 @@
                 }
             }
         }
-
+        // Проверка победы
         if (!gameWin && !gameOver && year > 15) {
             gameWin = true;
-            const maxVal = Math.max(factions.north, factions.nilfgaard, factions.magic, factions.witcher);
             let endingIdx = 4;
+            const maxVal = Math.max(factions.north, factions.nilfgaard, factions.magic, factions.witcher);
             if (factions.north === maxVal && questFlags.ciriFound) endingIdx = 0;
             else if (factions.north === maxVal) endingIdx = 1;
             else if (factions.nilfgaard === maxVal) endingIdx = 2;
@@ -390,7 +368,7 @@
             disableCards(true); return;
         }
 
-        if (!inBattle && !gameOver && !gameWin && year % 5 === 0 && year > 0) startBattle();
+        disableCards(gameOver || gameWin || inBattle);
         saveGame();
     }
 
@@ -399,54 +377,63 @@
         return map[k];
     }
 
-    function startBattle() {
-        inBattle = true; battlePanel.style.display = 'block'; choiceArea.style.display = 'none';
-        boss = { name: t('boss1'), hp: 30 + year * 2 };
-        playerHp = 40;
-        document.getElementById('bossName').textContent = boss.name;
-        document.getElementById('bossHp').textContent = boss.hp;
-        document.getElementById('playerHp').textContent = playerHp;
-        updateUI('⚔️ ' + (currentLang==='ru'?'БИТВА!':'BATTLE!'));
+    function applyCompanionBonus() {
+        if (!companion) return;
+        const bonuses = { dandelion: {north:2}, yennefer: {magic:3}, triss: {witcher:2} };
+        for (let f in bonuses[companion]) factions[f] = Math.min(100, factions[f] + bonuses[companion][f]);
     }
 
-    function battleAction(action) {
-        let playerDmg = 0, bossDmg = 0;
-        if (action === 'attack') { playerDmg = 12; bossDmg = 8; }
-        else if (action === 'dodge') { playerDmg = 5; bossDmg = Math.random() > 0.5 ? 0 : 6; }
-        else { playerDmg = 16; bossDmg = 5; }
-        
-        boss.hp -= playerDmg; playerHp -= bossDmg;
-        document.getElementById('bossHp').textContent = Math.max(0, boss.hp);
-        document.getElementById('playerHp').textContent = Math.max(0, playerHp);
+    function checkSeason() {
+        if (year % 3 === 0 && year % 6 !== 0) { season = 'winter'; factions.north-=2; factions.nilfgaard-=2; updateUI('❄️ Зима! Штраф фракциям.'); }
+        else if (year % 6 === 0) { season = 'spring'; factions.north+=3; factions.witcher+=3; updateUI('🌸 Весна! Бонус Северу и Ведьмакам.'); }
+    }
 
-        if (boss.hp <= 0) {
-            inBattle = false; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            artifacts.medallion++; year++;
-            updateUI('🎉 ' + (currentLang==='ru'?'Босс повержен!':'Boss defeated!'));
-            drawCards();
-        } else if (playerHp <= 0) {
-            gameOver = true; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            updateUI('💀 ' + (currentLang==='ru'?'Геральт погиб...':'Geralt died...'));
-        } else { updateUI(`${boss.name} HP: ${boss.hp}`); }
+    function randomEncounter() {
+        if (Math.random() > 0.4) return;
+        const r = Math.random();
+        if (r < 0.33) { artifacts.medallion++; updateUI('🛤️ Встречен купец! +1 Медальон.'); }
+        else if (r < 0.66) { factions.north = Math.max(0, factions.north-5); updateUI('🛤️ Бандиты! -5 Северу.'); }
+        else { artifacts.book++; updateUI('🛤️ Чародей обучает вас. +1 Книга.'); }
     }
 
     function drawCards() {
         if (gameOver || gameWin || inBattle) return;
-        let shuffled = [...deck].sort(() => Math.random() - 0.5);
+        
+        let pool = [...baseDeck];
+        if (Math.random() < 0.15) pool.push(legendaryDeck[Math.floor(Math.random()*legendaryDeck.length)]);
+        if (Math.random() < 0.2) pool.push(moralDeck[0]);
+        
+        if (questFlags.ciriQuestProgress < 3 && Math.random() < 0.3) {
+            pool.push(ciriQuestCards[questFlags.ciriQuestProgress]);
+        }
+        if (!companion && Math.random() < 0.25) {
+            pool.push(companionCards[Math.floor(Math.random()*companionCards.length)]);
+        }
+
+        let shuffled = pool.sort(() => Math.random() - 0.5);
         currentChoices = [shuffled[0], shuffled[1]];
         
-        const left = currentChoices[0];
-        document.getElementById('leftTitle').textContent = left.title[currentLang];
-        document.getElementById('leftDesc').textContent = left.desc[currentLang];
-        document.getElementById('leftEff').innerHTML = formatEffects(left.eff);
+        renderCard(0, currentChoices[0]);
+        renderCard(1, currentChoices[1]);
+    }
+
+    function renderCard(idx, card) {
+        const prefix = idx === 0 ? 'left' : 'right';
+        const elTitle = document.getElementById(prefix + 'Title');
+        const elDesc = document.getElementById(prefix + 'Desc');
+        const elEff = document.getElementById(prefix + 'Eff');
+        const elCard = document.getElementById(prefix + 'Card');
         
-        const right = currentChoices[1];
-        document.getElementById('rightTitle').textContent = right.title[currentLang];
-        document.getElementById('rightDesc').textContent = right.desc[currentLang];
-        document.getElementById('rightEff').innerHTML = formatEffects(right.eff);
+        elTitle.textContent = card.title[currentLang];
+        elDesc.textContent = card.desc[currentLang];
+        elEff.innerHTML = formatEffects(card.eff || (card.effA ? card.effA : {}));
+        elCard.classList.remove('legendary', 'moral');
+        if (card.legendary) elCard.classList.add('legendary');
+        if (card.moral) elCard.classList.add('moral');
     }
 
     function formatEffects(eff) {
+        if (!eff) return '—';
         let html = '';
         for (let f in eff) {
             if (eff[f] === 0) continue;
@@ -461,30 +448,84 @@
     function makeChoice(idx) {
         if (gameOver || gameWin || inBattle) return;
         const card = currentChoices[idx];
-        for (let f in card.eff) factions[f] = Math.min(100, Math.max(0, factions[f] + card.eff[f]));
-        if (card.title.ru.includes('Цири')) questFlags.ciriFound = true;
+        
+        // Обработка карты морали
+        if (card.moral) {
+            if (idx === 0) applyEffects(card.effA); else applyEffects(card.effB);
+        } else {
+            applyEffects(card.eff);
+        }
+        
+        // Спецэффекты
+        if (card.type) { companion = card.type; updateUI(`🧙 ${card.title[currentLang]} присоединился!`); }
+        if (card.step && card.step === questFlags.ciriQuestProgress + 1) {
+            questFlags.ciriQuestProgress++;
+            if (questFlags.ciriQuestProgress === 3) questFlags.ciriFound = true;
+        }
+        
+        applyCompanionBonus();
         year++;
-        updateUI((currentLang==='ru'?'Вы выбрали: ':'You chose: ') + card.title[currentLang]);
+        checkSeason();
+        randomEncounter();
+        
+        updateUI(`${currentLang==='ru'?'Вы выбрали':'You chose'}: ${card.title[currentLang]}`);
         drawCards();
+    }
+
+    function applyEffects(eff) {
+        for (let f in eff) factions[f] = Math.min(100, Math.max(0, factions[f] + eff[f]));
     }
 
     function useArtifact(type) {
         if (gameOver || gameWin || inBattle || artifacts[type] <= 0) return;
         artifacts[type]--;
         if (type === 'medallion') { factions.witcher += 10; updateUI('🐺 +10 ' + t('witch')); }
-        else if (type === 'sword') { factions.north += 8; factions.nilfgaard -= 4; updateUI('⚔️ +8 ' + t('north') + ' -4 ' + t('nilf')); }
+        else if (type === 'sword') { factions.north += 8; factions.nilfgaard -= 4; updateUI('⚔️ +8 ' + t('north')); }
         else if (type === 'book') { factions.magic += 12; updateUI('📖 +12 ' + t('magic')); }
+        updateUI();
         drawCards();
+    }
+
+    function startBattle() {
+        inBattle = true; battlePanel.style.display = 'block'; choiceArea.style.display = 'none';
+        boss = { name: t('boss1'), hp: 30 + year * 2 };
+        playerHp = 40;
+        document.getElementById('bossName').textContent = boss.name;
+        document.getElementById('bossHp').textContent = boss.hp;
+        document.getElementById('playerHp').textContent = playerHp;
+        updateUI('⚔️ ' + (currentLang==='ru'?'БИТВА!':'BATTLE!'));
+    }
+
+    function battleAction(action) {
+        let dmg = 0, bossDmg = 0;
+        if (action === 'attack') { dmg = 12; bossDmg = 8; }
+        else if (action === 'dodge') { dmg = 5; bossDmg = Math.random()>0.5?0:6; }
+        else { dmg = 16; bossDmg = 5; }
+        boss.hp -= dmg; playerHp -= bossDmg;
+        document.getElementById('bossHp').textContent = Math.max(0, boss.hp);
+        document.getElementById('playerHp').textContent = Math.max(0, playerHp);
+        if (boss.hp <= 0) {
+            inBattle = false; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
+            artifacts.medallion++; year++;
+            updateUI('🎉 ' + (currentLang==='ru'?'Босс повержен!':'Boss defeated!'));
+            drawCards();
+        } else if (playerHp <= 0) {
+            gameOver = true; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
+            updateUI('💀 ' + (currentLang==='ru'?'Геральт погиб...':'Geralt died...'));
+        } else { updateUI(`${boss.name} HP: ${boss.hp}`); }
     }
 
     function disableCards(disabled) {
         document.getElementById('leftCard').classList.toggle('disabled', disabled);
         document.getElementById('rightCard').classList.toggle('disabled', disabled);
+        document.getElementById('medallionBtn').disabled = disabled || artifacts.medallion <= 0;
+        document.getElementById('swordBtn').disabled = disabled || artifacts.sword <= 0;
+        document.getElementById('bookBtn').disabled = disabled || artifacts.book <= 0;
     }
 
     function saveGame() {
         if (tg.CloudStorage) {
-            const save = JSON.stringify({ factions, artifacts, year, questFlags, playerHp, currentLang });
+            const save = JSON.stringify({ factions, artifacts, year, questFlags, companion, currentLang });
             tg.CloudStorage.setItem('witcher_save', save);
         }
     }
@@ -493,20 +534,79 @@
         factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
         artifacts = { medallion: 1, sword: 1, book: 1 };
         year = 1; gameOver = false; gameWin = false; inBattle = false;
+        questFlags = { ciriFound: false, ciriQuestProgress: 0 };
+        companion = null; season = 'spring';
         battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
         endMsg.innerHTML = '';
         updateUI(t('welcome'));
         drawCards();
     }
 
-    // Загрузка темы и языка
+    // Тема, Язык, Туториал
+    function toggleTheme() {
+        document.getElementById('mainBody').classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        document.getElementById('themeBtn').textContent = isLight ? '☀️ Светлая' : '🌙 Тёмная';
+        localStorage.setItem('witcher_theme', isLight ? 'light' : 'dark');
+    }
+    function applyLanguage() {
+        document.getElementById('gameTitle').textContent = t('title');
+        document.getElementById('fNorth').innerHTML = `🛡️ ${t('north')}`;
+        document.getElementById('fNilf').innerHTML = `☀️ ${t('nilf')}`;
+        document.getElementById('fMagic').innerHTML = `🔮 ${t('magic')}`;
+        document.getElementById('fWitch').innerHTML = `⚔️ ${t('witch')}`;
+        document.getElementById('medName').textContent = t('med');
+        document.getElementById('swordName').textContent = t('sword');
+        document.getElementById('bookName').textContent = t('book');
+        document.getElementById('resetLabel').textContent = t('reset');
+        document.getElementById('attLabel').textContent = t('attack');
+        document.getElementById('dodgeLabel').textContent = t('dodge');
+        document.getElementById('signLabel').textContent = t('sign');
+        document.getElementById('battleYourHp').textContent = t('yourHp');
+        document.getElementById('langBtn').textContent = currentLang === 'ru' ? '🌍 EN' : '🌍 RU';
+        if (!gameOver && !gameWin) eventLog.textContent = t('welcome');
+        updateUI();
+    }
+    function toggleLanguage() {
+        currentLang = currentLang === 'ru' ? 'en' : 'ru';
+        applyLanguage();
+        drawCards();
+    }
+    let tutStep = 0;
+    function startTutorial() { tutStep = 0; document.getElementById('tutorialOverlay').style.display='flex'; updateTutorialText(); }
+    function nextTutorialStep() { tutStep++; if(tutStep>=3) closeTutorial(); else updateTutorialText(); }
+    function updateTutorialText() {
+        const steps = [
+            {title:'Выбор карт', desc:'Каждый ход выбирайте одну из двух карт.'},
+            {title:'Баланс', desc:'Не дайте ни одной фракции упасть до 0.'},
+            {title:'Битвы', desc:'Раз в 5 лет — бой с боссом.'}
+        ];
+        document.getElementById('tutTitle').textContent = steps[tutStep].title;
+        document.getElementById('tutDesc').textContent = steps[tutStep].desc;
+        document.getElementById('tutNext').textContent = tutStep===2?'Завершить':'Далее';
+    }
+    function closeTutorial() { document.getElementById('tutorialOverlay').style.display='none'; }
+
+    // Загрузка сохранения и старт
     const savedTheme = localStorage.getItem('witcher_theme');
     if (savedTheme === 'light') document.getElementById('mainBody').classList.add('light-theme');
     document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '☀️ Светлая' : '🌙 Тёмная';
 
-    applyLanguage();
-    resetGame();
-    startTutorial(); // Показать при первом запуске
+    if (tg.CloudStorage) {
+        tg.CloudStorage.getItem('witcher_save', (err, value) => {
+            if (!err && value) {
+                try {
+                    const save = JSON.parse(value);
+                    factions = save.factions; artifacts = save.artifacts; year = save.year;
+                    questFlags = save.questFlags; companion = save.companion; currentLang = save.currentLang || 'ru';
+                    applyLanguage();
+                    updateUI('Игра загружена.');
+                    drawCards();
+                } catch(e) { resetGame(); }
+            } else { resetGame(); }
+        });
+    } else { resetGame(); }
+    startTutorial();
 </script>
 </body>
-                                      </html>
+    </html>
