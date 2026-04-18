@@ -3,550 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐺 Ведьмак: Выбор Судьбы v7.0</title>
-    <link rel="manifest" href="data:application/manifest+json,{name:'Witcher:Fate Choice',short_name:'Witcher',display:'standalone',theme_color:'#0a0c0f',background_color:'#0a0c0f',icons:[{src:'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext x=\'10\' y=\'70\' font-size=\'70\'%3E🐺%3C/text%3E%3C/svg%3E',sizes:'100x100',type:'image/svg+xml'}]}">
-    <meta name="theme-color" content="#0a0c0f">
+    <title>🏰 DUNGEON LEAP</title>
     <style>
-        * { box-sizing: border-box; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            margin: 0; padding: 12px; min-height: 100vh;
-            font-family: 'Cinzel', 'Segoe UI', serif;
-            background: #0a0c0f; color: #d4cfc4;
+            background: #0a0a0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
         }
-        body.light-theme { background: #f0ebe0; color: #1a1a1a; }
-        .game-container {
-            max-width: 850px; margin: 0 auto; padding: 20px;
-            border-radius: 32px; border: 2px solid #5a6b4b;
-            background: rgba(10, 15, 10, 0.95);
-            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+        .game-wrapper {
+            background: #1a1a2a;
+            padding: 20px;
+            border-radius: 24px;
+            border: 3px solid #8b0000;
+            box-shadow: 0 0 30px #8b000088;
         }
-        body.light-theme .game-container { background: rgba(255, 250, 240, 0.95); border-color: #8a7a5a; }
-        h2 { margin: 0 0 8px; color: #b9a57c; text-shadow: 2px 2px 0 #1e2a1a; display: flex; align-items: center; gap: 8px; font-size: 20px; flex-wrap: wrap; }
-        body.light-theme h2 { color: #4a3a1a; text-shadow: none; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-        .top-bar button { background: #2a352a; border: 1px solid #7a9a5a; color: #efe0c0; padding: 6px 12px; border-radius: 30px; font-size: 14px; cursor: pointer; }
-        body.light-theme .top-bar button { background: #d4c8b0; border-color: #5a4a2a; color: #1a1a1a; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .overlay-box { max-width: 550px; width: 90%; background: #1a221a; padding: 24px; border-radius: 32px; border: 2px solid #b9a57c; max-height: 85vh; overflow-y: auto; color: #d4cfc4; }
-        body.light-theme .overlay-box { background: #f0e8d8; color: #1a1a1a; border-color: #5a4a2a; }
-        .mode-btn { background: #3a4a3a; border: 1px solid #9aad8a; color: #efe0c0; padding: 10px; margin: 5px 0; border-radius: 20px; cursor: pointer; width: 100%; text-align: left; }
-        body.light-theme .mode-btn { background: #c8b898; color: #1a1a1a; border-color: #5a4a2a; }
-        .timer-badge { background: #4a2a2a; padding: 4px 10px; border-radius: 20px; font-size: 18px; font-weight: bold; color: #ffa0a0; }
-        .factions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 15px 0; }
-        .faction-card { padding: 10px 4px; border-radius: 12px; text-align: center; background: #1c261c; border: 1px solid #6a7a5a; }
-        body.light-theme .faction-card { background: #d4c8b0; border-color: #8a7a5a; }
-        .faction-name { font-size: 12px; color: #9aad8a; }
-        body.light-theme .faction-name { color: #3a4a2a; }
-        .faction-value { font-size: 24px; font-weight: bold; }
-        .north { color: #6a9aff; } .nilf { color: #ffb347; } .magic { color: #c26aff; } .witcher { color: #6aff8a; }
-        .choice-area { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0; }
-        .card { border-radius: 24px; padding: 16px 10px; cursor: pointer; text-align: center; box-shadow: 0 6px 0 #1a261a; background: #1a221a; border: 2px solid #7a9a5a; position: relative; }
-        body.light-theme .card { background: #e0d4c0; border-color: #8a7a5a; box-shadow: 0 6px 0 #a09070; }
-        .card.legendary { border: 4px solid gold !important; }
-        .card:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a261a; }
-        .card.disabled { opacity: 0.5; pointer-events: none; }
-        .card-portrait { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px; background-size: cover; background-position: center; border: 2px solid #b9a57c; }
-        .card-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #e0d4b2; }
-        body.light-theme .card-title { color: #2a1a0a; }
-        .battle-panel { border-radius: 24px; padding: 16px; margin: 15px 0; text-align: center; background: #2a1a1a; border: 2px solid #b34a4a; }
-        .event-log { border-radius: 16px; padding: 14px; margin: 16px 0; border-left: 6px solid #b9a57c; font-size: 14px; max-height: 90px; overflow-y: auto; background: #0e130e; color: #c0c8b0; }
-        body.light-theme .event-log { background: #d8ccb8; color: #1a1a1a; border-left-color: #5a4a2a; }
-        .reset-btn { border: 1px solid #6a7a5a; padding: 14px; font-size: 16px; width: 100%; margin-top: 10px; border-radius: 40px; cursor: pointer; background: #1e261e; color: #b0b89a; }
-        .settings-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; flex-wrap: wrap; gap: 10px; }
-        .gwent-card { display: inline-block; width: 60px; height: 90px; background: #2a352a; border-radius: 8px; margin: 5px; text-align: center; padding: 5px; border: 1px solid gold; }
-        .achievement { padding: 8px; margin: 5px 0; background: #2a352a; border-radius: 12px; }
-        .achievement.completed { background: #3a6a3a; }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 12px;
+            border: 2px solid #4a0000;
+            background: #0d0d15;
+            cursor: pointer;
+        }
+        .ui-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px 0 8px;
+            color: #d4af37;
+            text-shadow: 2px 2px 0 #4a0000;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .hearts { color: #ff4444; font-size: 28px; letter-spacing: 4px; }
+        .coins { color: #ffd700; }
+        button {
+            background: #2a1a1a;
+            color: #d4af37;
+            border: 2px solid #8b0000;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #4a0000;
+            transition: 0.1s;
+            margin-top: 12px;
+            width: 100%;
+        }
+        button:active { transform: translateY(4px); box-shadow: none; }
+        .hidden { display: none; }
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex; justify-content: center;
+            align-items: center; z-index: 1000;
+        }
+        .overlay-box {
+            background: #1a1a2a; padding: 30px; border-radius: 30px;
+            border: 3px solid #8b0000; text-align: center; color: #d4af37;
+        }
+        .overlay-box h2 { font-size: 36px; margin-bottom: 16px; }
+        .overlay-box button {
+            background: #8b0000; color: #d4af37; border: none;
+            padding: 14px 30px; font-size: 20px; margin-top: 20px;
+        }
     </style>
 </head>
-<body id="mainBody" class="">
-<!-- НОВОСТИ -->
-<div id="newsOverlay" class="overlay">
+<body>
+<div class="game-wrapper">
+    <div class="ui-panel">
+        <span class="hearts" id="hearts">❤️❤️❤️</span>
+        <span class="coins">💰 <span id="score">0</span></span>
+    </div>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <button id="restartBtn">🔄 НАЧАТЬ ЗАНОВО</button>
+</div>
+<div id="gameOverlay" class="overlay hidden">
     <div class="overlay-box">
-        <h3>📰 Патчноут v7.0 — ЛЕГЕНДА</h3>
-        <ul><li>🃏 ГВИНТ — коллекционируйте карты и сражайтесь!</li><li>🏆 15+ ДОСТИЖЕНИЙ</li><li>📖 БЕСТИАРИЙ с 10+ чудовищами</li><li>☁️ Облачная синхронизация</li><li>👥 Сюжетные линии компаньонов</li><li>📜 Журнал сюжета Ведьмака (все части)</li></ul>
-        <button onclick="document.getElementById('newsOverlay').style.display='none'" style="width:100%; padding:10px; margin-top:15px; background:#7a9a5a; color:white; border:none; border-radius:30px;">Закрыть</button>
+        <h2 id="overlayTitle">💀 ВЫ ПОГИБЛИ</h2>
+        <p id="overlayMessage">Крысы загрызли эльфа...</p>
+        <button onclick="location.reload()">🔄 ИГРАТЬ СНОВА</button>
     </div>
 </div>
 
-<!-- НАСТРОЙКИ -->
-<div id="settingsOverlay" class="overlay">
-    <div class="overlay-box">
-        <h3>⚙️ Настройки</h3>
-        <div class="settings-row"><span>🌍 Язык</span><select id="langSelect"></select></div>
-        <div class="settings-row"><span>🎚️ Сложность</span><select id="difficultySelect"><option value="easy">Лёгкая</option><option value="normal" selected>Нормальная</option><option value="hard">Хардкор</option></select></div>
-        <div class="settings-row"><span>🎮 Режим</span><select id="gameModeSelect"><option value="normal" selected>Обычный</option><option value="survival">🏆 Выживание</option><option value="speedrun">⏱️ Скоростное</option><option value="hardcore">💀 Хардкор</option><option value="sandbox">🧪 Песочница</option><option value="daily">📅 Ежедневное</option></select></div>
-        <div class="settings-row"><span>🔊 Звуки</span><button id="muteBtn" onclick="toggleMute()">🔊 Вкл</button></div>
-        <hr><button onclick="closeSettings()" style="width:100%; padding:12px; border-radius:30px; background:#7a9a5a; color:white;">Закрыть</button>
-    </div>
-</div>
-
-<!-- ГВИНТ -->
-<div id="gwentOverlay" class="overlay">
-    <div class="overlay-box">
-        <h3>🃏 ГВИНТ</h3>
-        <div id="gwentGame"></div>
-        <button onclick="closeGwent()" style="width:100%; margin-top:15px;">Закрыть</button>
-    </div>
-</div>
-
-<!-- ДОСТИЖЕНИЯ -->
-<div id="achievementsOverlay" class="overlay">
-    <div class="overlay-box">
-        <h3>🏆 ДОСТИЖЕНИЯ</h3>
-        <div id="achievementsList"></div>
-        <button onclick="closeAchievements()" style="width:100%; margin-top:15px;">Закрыть</button>
-    </div>
-</div>
-
-<!-- БЕСТИАРИЙ -->
-<div id="bestiaryOverlay" class="overlay">
-    <div class="overlay-box">
-        <h3>📖 БЕСТИАРИЙ</h3>
-        <div id="bestiaryList"></div>
-        <button onclick="closeBestiary()" style="width:100%; margin-top:15px;">Закрыть</button>
-    </div>
-</div>
-
-<!-- ЖУРНАЛ СЮЖЕТА -->
-<div id="journalOverlay" class="overlay">
-    <div class="overlay-box">
-        <h3>📜 ЖУРНАЛ ВЕДЬМАКА</h3>
-        <div id="journalContent" style="max-height: 400px; overflow-y: auto;"></div>
-        <button onclick="closeJournal()" style="width:100%; margin-top:15px;">Закрыть</button>
-    </div>
-</div>
-
-<div class="game-container">
-    <div class="top-bar">
-        <h2>🐺 <span id="gameTitle">Ведьмак: Выбор Судьбы</span></h2>
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <button onclick="showNews()">📢</button>
-            <button onclick="openGwent()">🃏</button>
-            <button onclick="openAchievements()">🏆</button>
-            <button onclick="openBestiary()">📖</button>
-            <button onclick="openJournal()">📜</button>
-            <button onclick="toggleTheme()" id="themeBtn">🌙</button>
-            <button onclick="openSettings()">⚙️</button>
-        </div>
-    </div>
-    
-    <div style="display: flex; justify-content: space-between;">
-        <div class="years-badge" id="yearDisplay">Год 1 / 15</div>
-        <div id="modeDisplay" class="timer-badge">🎮 Обычный</div>
-    </div>
-    <div id="timerDisplay" class="timer-badge" style="display: none;">⏱️ 15 сек</div>
-
-    <div class="factions">
-        <div class="faction-card"><span class="faction-name" id="fNorth">🛡️ Север</span> <span class="faction-value north" id="northVal">50</span></div>
-        <div class="faction-card"><span class="faction-name" id="fNilf">☀️ Нильф</span> <span class="faction-value nilf" id="nilfVal">50</span></div>
-        <div class="faction-card"><span class="faction-name" id="fMagic">🔮 Магия</span> <span class="faction-value magic" id="magicVal">50</span></div>
-        <div class="faction-card"><span class="faction-name" id="fWitch">⚔️ Ведьмаки</span> <span class="faction-value witcher" id="witcherVal">50</span></div>
-    </div>
-
-    <div class="battle-panel" id="battlePanel" style="display: none;">
-        <div class="boss-name" id="bossName">🐉 Мглистый</div>
-        <div class="boss-hp">❤️ <span id="bossHp">30</span></div>
-        <div><span id="battleYourHp">Ваше здоровье</span>: ❤️ <span id="playerHp">40</span></div>
-        <div class="battle-actions">
-            <button class="battle-btn" onclick="battleAction('attack')">⚔️ Атака</button>
-            <button class="battle-btn" onclick="battleAction('dodge')">🌀 Уклонение</button>
-        </div>
-        <div class="signs-panel">
-            <button class="battle-btn" onclick="castSign('aard')">🔮 Аард</button>
-            <button class="battle-btn" onclick="castSign('igni')">🔥 Игни</button>
-            <button class="battle-btn" onclick="castSign('quen')">🛡️ Квен</button>
-            <button class="battle-btn" onclick="castSign('axii')">🧠 Аксий</button>
-            <button class="battle-btn" onclick="castSign('yrden')">⭕ Ирден</button>
-        </div>
-    </div>
-
-    <div class="choice-area" id="choiceArea">
-        <div class="card" id="leftCard" onclick="makeChoice(0)">
-            <div class="card-portrait" id="leftPortrait"></div>
-            <div class="card-title" id="leftTitle">—</div>
-            <div class="card-desc" id="leftDesc">—</div>
-            <div class="card-effects" id="leftEff">—</div>
-        </div>
-        <div class="card" id="rightCard" onclick="makeChoice(1)">
-            <div class="card-portrait" id="rightPortrait"></div>
-            <div class="card-title" id="rightTitle">—</div>
-            <div class="card-desc" id="rightDesc">—</div>
-            <div class="card-effects" id="rightEff">—</div>
-        </div>
-    </div>
-
-    <div class="event-log" id="eventLog">Геральт, выберите первую карту...</div>
-    <button class="reset-btn" onclick="resetGame()">🔄 <span id="resetLabel">Начать заново</span></button>
-    <div id="endMsg" class="end-msg"></div>
-</div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
     const tg = window.Telegram.WebApp;
     tg.ready(); tg.expand();
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register("data:application/javascript,");
 
-    // ========== АУДИО ==========
-    let muted = false;
-    const bgMusic = new Audio('https://cdn.freesound.org/previews/722/722604_11861866-lq.mp3');
-    bgMusic.loop = true; bgMusic.volume = 0.3;
-    const sfxClick = new Audio('https://cdn.freesound.org/previews/242/242809_4284968-lq.mp3');
-    sfxClick.volume = 0.6;
-    const sfxBattle = new Audio('https://cdn.freesound.org/previews/353/353113_6627936-lq.mp3');
-    sfxBattle.volume = 0.5;
-    const sfxWin = new Audio('https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3');
-    sfxWin.volume = 0.7;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
     
-    function playClick() { if(muted) return; sfxClick.currentTime = 0; sfxClick.play().catch(()=>{}); }
-    function playBattle() { if(muted) return; sfxBattle.currentTime = 0; sfxBattle.play().catch(()=>{}); }
-    function playWin() { if(muted) return; sfxWin.currentTime = 0; sfxWin.play().catch(()=>{}); }
-    function toggleMute() {
-        muted = !muted;
-        bgMusic.volume = muted ? 0 : (document.getElementById('musicVolume').value / 100);
-        document.getElementById('muteBtn').textContent = muted ? '🔇 Выкл' : '🔊 Вкл';
-    }
-
-    // ========== ПОРТРЕТЫ ==========
-    const portraits = {
-        geralt: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%234a5a6a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🐺%3C/text%3E%3C/svg%3E',
-        yennefer: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%236a4a6a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🔮%3C/text%3E%3C/svg%3E',
-        ciri: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%234a6a5a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E⚔️%3C/text%3E%3C/svg%3E',
-        dandelion: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%236a5a3a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🎵%3C/text%3E%3C/svg%3E',
-        vesemir: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%235a5a5a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🗡️%3C/text%3E%3C/svg%3E',
-        triss: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%238a4a2a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🔥%3C/text%3E%3C/svg%3E',
-        zoltan: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%234a3a2a\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'white\'%3E🍺%3C/text%3E%3C/svg%3E'
+    // Игрок
+    const player = {
+        x: 50, y: 300, width: 30, height: 40,
+        vx: 0, vy: 0, speed: 4, jumpPower: -9,
+        health: 3, maxHealth: 3,
+        grounded: false
     };
-
-    // ========== БЕСТИАРИЙ ==========
-    const bestiary = {
-        griffin: { name: 'Грифон', desc: 'Крупный летающий хищник. Уязвим к Аарду и серебру.', weakness: 'aard', killed: false },
-        leshen: { name: 'Леший', desc: 'Дух леса. Призывает волков. Боится огня.', weakness: 'igni', killed: false },
-        vampire: { name: 'Высший Вампир', desc: 'Невидимый и быстрый. Только Квен спасёт.', weakness: 'quen', killed: false },
-        wildHunt: { name: 'Дикая Охота', desc: 'Эльфы-призраки. Замедляются Ирденом.', weakness: 'yrden', killed: false },
-        foglet: { name: 'Мглистый', desc: 'Исчезает в тумане. Аксий сбивает с толку.', weakness: 'axii', killed: false }
-    };
-
-    // ========== ДОСТИЖЕНИЯ ==========
-    let achievements = {
-        monsterSlayer: { name: 'Убийца чудовищ', desc: 'Убейте 5 боссов', progress: 0, max: 5, completed: false },
-        gwentMaster: { name: 'Мастер Гвинта', desc: 'Выиграйте 3 партии в Гвинт', progress: 0, max: 3, completed: false },
-        ciriSavior: { name: 'Спаситель Цири', desc: 'Завершите квест Цири', progress: 0, max: 1, completed: false },
-        explorer: { name: 'Исследователь', desc: 'Сыграйте 50 карт', progress: 0, max: 50, completed: false },
-        survivor: { name: 'Выживший', desc: 'Доживите до 20 года', progress: 0, max: 1, completed: false }
-    };
-
-    // ========== ГВИНТ ==========
-    let gwentCards = [];
-    let gwentDeck = [];
-    let gwentWins = 0;
-
-    function initGwent() {
-        gwentCards = [
-            { name: 'Геральт', power: 15, type: 'hero' },
-            { name: 'Цири', power: 15, type: 'hero' },
-            { name: 'Йеннифэр', power: 7, type: 'ranged' },
-            { name: 'Трисс', power: 7, type: 'ranged' },
-            { name: 'Лютик', power: 2, type: 'support' },
-            { name: 'Золтан', power: 5, type: 'melee' },
-            { name: 'Весемир', power: 6, type: 'melee' },
-            { name: 'Осада', power: 6, type: 'siege' },
-            { name: 'Лучники', power: 4, type: 'ranged' },
-            { name: 'Пехота', power: 3, type: 'melee' }
+    
+    // Управление
+    const keys = { a: false, d: false, space: false };
+    
+    // Мир
+    let platforms = [];
+    let coins = [];
+    let enemies = [];
+    let spikes = [];
+    let door = null;
+    let key = null;
+    let hasKey = false;
+    let score = 0;
+    let gameActive = true;
+    let currentLevel = 1;
+    
+    function buildLevel() {
+        platforms = [
+            { x: 0, y: 360, w: 800, h: 40 }, // пол
+            { x: 200, y: 280, w: 120, h: 15 },
+            { x: 450, y: 220, w: 150, h: 15 },
+            { x: 650, y: 300, w: 100, h: 15 }
         ];
-        gwentDeck = [...gwentCards.slice(0, 5)];
+        
+        coins = [
+            { x: 250, y: 250, w: 15, h: 15, collected: false },
+            { x: 500, y: 190, w: 15, h: 15, collected: false },
+            { x: 700, y: 270, w: 15, h: 15, collected: false }
+        ];
+        
+        enemies = [
+            { x: 300, y: 330, w: 25, h: 25, vx: 1.5, minX: 250, maxX: 400, alive: true }
+        ];
+        
+        spikes = [
+            { x: 400, y: 345, w: 30, h: 15 }
+        ];
+        
+        key = { x: 550, y: 190, w: 15, h: 15, collected: false };
+        door = { x: 750, y: 270, w: 30, h: 60, opened: false };
     }
-
-    // ========== ЖУРНАЛ СЮЖЕТА ==========
-    const witcherJournal = [
-        { game: 'Ведьмак 1', events: ['Прибытие в Вызиму', 'Саламандры', 'Восстание', 'Смерть Якова'] },
-        { game: 'Ведьмак 2', events: ['Убийство Фольтеста', 'Ла Валетты', 'Лок Муинне', 'Судьба Лето'] },
-        { game: 'Ведьмак 3', events: ['Поиски Цири', 'Кровавый Барон', 'Битва за Каэр Морхен', 'Финал'] }
-    ];
-
-    // ========== КОМПАНЬОНЫ ==========
-    let companionQuests = {
-        dandelion: { started: false, completed: false, name: 'Лютик' },
-        yennefer: { started: false, completed: false, name: 'Йеннифэр' },
-        triss: { started: false, completed: false, name: 'Трисс' },
-        vesemir: { started: false, completed: false, name: 'Весемир' }
-    };
-
-    // ========== СОСТОЯНИЕ ==========
-    let factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
-    let year = 1, gameOver = false, gameWin = false, inBattle = false;
-    let boss = null, playerHp = 40, maxHp = 40;
-    let questFlags = { ciriFound: false, ciriQuestProgress: 0, bossesKilled: 0, cardsPlayed: 0 };
-    let currentChoices = [];
-    let gameMode = 'normal', difficulty = 'normal';
-    let speedrunTimer = null, timeLeft = 15;
-    let companion = null;
-
-    const bosses = [
-        { name: 'Грифон', hp: 40, attack: 10, weakness: 'aard', type: 'griffin' },
-        { name: 'Леший', hp: 50, attack: 8, weakness: 'igni', type: 'leshen' },
-        { name: 'Высший Вампир', hp: 45, attack: 12, weakness: 'quen', type: 'vampire' },
-        { name: 'Дикая Охота', hp: 60, attack: 15, weakness: 'yrden', type: 'wildHunt' },
-        { name: 'Мглистый', hp: 35, attack: 7, weakness: 'axii', type: 'foglet' }
-    ];
-
-    const baseDeck = [
-        { title:{ru:"Помочь крестьянам",en:"Help peasants"}, desc:{ru:"Селяне просят защиты."}, eff:{north:8,nilfgaard:-4,magic:-2,witcher:5}, portrait:'geralt' },
-        { title:{ru:"Договор с Нильфгаардом",en:"Pact with Nilfgaard"}, desc:{ru:"Империя предлагает мир."}, eff:{north:-6,nilfgaard:12,magic:-2,witcher:-4}, portrait:'yennefer' },
-        { title:{ru:"Совет чародеек",en:"Sorceress Council"}, desc:{ru:"Ложа собирает силы."}, eff:{north:-4,nilfgaard:-4,magic:15,witcher:2}, portrait:'yennefer' },
-        { title:{ru:"Охота на грифона",en:"Griffin Hunt"}, desc:{ru:"Заказ из Каэр Морхен."}, eff:{north:3,nilfgaard:-2,magic:0,witcher:12}, portrait:'vesemir' },
-        { title:{ru:"Поддержать партизан",en:"Support partisans"}, desc:{ru:"Темерские повстанцы."}, eff:{north:10,nilfgaard:-8,magic:-4,witcher:2}, portrait:'geralt' },
-        { title:{ru:"Торговый путь",en:"Trade route"}, desc:{ru:"Купцы просят охрану."}, eff:{north:6,nilfgaard:6,magic:0,witcher:4}, portrait:'dandelion' }
-    ];
-
-    const legendaryDeck = [
-        { title:{ru:"Меч Предназначения",en:"Sword of Destiny"}, desc:{ru:"Zireael"}, eff:{north:15,nilfgaard:15,magic:5,witcher:15}, legendary:true, portrait:'ciri' },
-        { title:{ru:"Солнце Нильфгаарда",en:"Nilfgaardian Sun"}, desc:{ru:"Империя наступает"}, eff:{north:-20,nilfgaard:25,magic:-5,witcher:0}, legendary:true, portrait:'yennefer' }
-    ];
-
-    const moralDeck = [
-        { title:{ru:"Меньшее зло",en:"Lesser Evil"}, desc:{ru:"Спасти детей или ведьму?"}, effA:{north:-10,magic:10}, effB:{north:10,magic:-10}, moral:true, portrait:'geralt' }
-    ];
-
-    const ciriQuestCards = [
-        { step:1, title:{ru:"Слухи о Цири",en:"Rumors of Ciri"}, eff:{north:2,witcher:4}, portrait:'ciri' },
-        { step:2, title:{ru:"След Ласточки",en:"Swallow's Trail"}, eff:{north:3,magic:3}, portrait:'ciri' },
-        { step:3, title:{ru:"Башня Ласточки",en:"Tower of the Swallow"}, eff:{north:10,witcher:10,magic:10}, portrait:'ciri' }
-    ];
-
-    // ========== DOM ==========
-    const northEl = document.getElementById('northVal'), nilfEl = document.getElementById('nilfVal');
-    const magicEl = document.getElementById('magicVal'), witcherEl = document.getElementById('witcherVal');
-    const yearEl = document.getElementById('yearDisplay'), eventLog = document.getElementById('eventLog');
-    const endMsg = document.getElementById('endMsg'), battlePanel = document.getElementById('battlePanel');
-    const choiceArea = document.getElementById('choiceArea');
-
-    function updateUI(msg) {
-        northEl.textContent = Math.max(0, factions.north);
-        nilfEl.textContent = Math.max(0, factions.nilfgaard);
-        magicEl.textContent = Math.max(0, factions.magic);
-        witcherEl.textContent = Math.max(0, factions.witcher);
-        yearEl.textContent = `${year} / ${gameMode === 'survival' ? '∞' : '15'}`;
-        if (msg) eventLog.innerHTML = msg;
-
-        if (!gameOver && !gameWin && !inBattle && gameMode !== 'sandbox') {
-            for (let f in factions) {
-                if (factions[f] <= 0) {
-                    gameOver = true;
-                    endMsg.innerHTML = `<div class="lose">💀 ${getFactionName(f)} потеряла влияние.</div>`;
-                    disableCards(true); return;
+    
+    buildLevel();
+    
+    function resetGame() {
+        player.x = 50; player.y = 300; player.vx = 0; player.vy = 0;
+        player.health = player.maxHealth;
+        hasKey = false;
+        score = 0;
+        gameActive = true;
+        currentLevel = 1;
+        buildLevel();
+        document.getElementById('gameOverlay').classList.add('hidden');
+        updateUI();
+    }
+    
+    function updateUI() {
+        const hearts = '❤️'.repeat(player.health) + '🖤'.repeat(player.maxHealth - player.health);
+        document.getElementById('hearts').textContent = hearts;
+        document.getElementById('score').textContent = score;
+    }
+    
+    function checkCollisions() {
+        player.grounded = false;
+        
+        // Платформы
+        platforms.forEach(p => {
+            if (player.x < p.x + p.w && player.x + player.width > p.x &&
+                player.y + player.height > p.y && player.y < p.y + p.h) {
+                if (player.vy >= 0 && player.y + player.height - player.vy <= p.y) {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    player.grounded = true;
                 }
             }
-        }
-        
-        if (!gameWin && !gameOver && year > 15 && gameMode !== 'survival' && gameMode !== 'sandbox') {
-            gameWin = true;
-            endMsg.innerHTML = `<div class="win">🏆 Победа!</div>`;
-            disableCards(true); return;
-        }
-        
-        disableCards(gameOver || gameWin || inBattle);
-        if (!gameOver && !gameWin) saveGame();
-    }
-
-    function getFactionName(k) {
-        const map = { north: 'Север', nilfgaard: 'Нильфгаард', magic: 'Магия', witcher: 'Ведьмаки' };
-        return map[k];
-    }
-
-    function drawCards() {
-        if (gameOver || gameWin || inBattle) return;
-        let pool = [...baseDeck];
-        if (Math.random() < 0.15) pool.push(legendaryDeck[Math.floor(Math.random()*legendaryDeck.length)]);
-        if (Math.random() < 0.2) pool.push(moralDeck[0]);
-        if (questFlags.ciriQuestProgress < 3 && Math.random() < 0.3) pool.push(ciriQuestCards[questFlags.ciriQuestProgress]);
-        let shuffled = pool.sort(() => Math.random() - 0.5);
-        currentChoices = [shuffled[0], shuffled[1]];
-        renderCard(0, currentChoices[0]); renderCard(1, currentChoices[1]);
-        if (gameMode === 'speedrun') { timeLeft = 15; }
-    }
-
-    function renderCard(idx, card) {
-        const prefix = idx === 0 ? 'left' : 'right';
-        document.getElementById(prefix + 'Title').textContent = card.title.ru || card.title.en;
-        document.getElementById(prefix + 'Desc').textContent = card.desc?.ru || card.desc?.en || '';
-        document.getElementById(prefix + 'Eff').innerHTML = formatEffects(card.eff || card.effA || {});
-        document.getElementById(prefix + 'Portrait').style.backgroundImage = `url('${portraits[card.portrait || 'geralt']}')`;
-        const elCard = document.getElementById(prefix + 'Card');
-        elCard.classList.remove('legendary', 'moral');
-        if (card.legendary) elCard.classList.add('legendary');
-        if (card.moral) elCard.classList.add('moral');
-    }
-
-    function formatEffects(eff) {
-        if (!eff) return '—';
-        let html = '';
-        for (let f in eff) {
-            if (eff[f] === 0) continue;
-            const sign = eff[f] > 0 ? '+' : '';
-            const color = eff[f] > 0 ? '#6aff8a' : '#ff6a6a';
-            const name = f === 'north' ? '🛡️' : (f === 'nilfgaard' ? '☀️' : (f === 'magic' ? '🔮' : '⚔️'));
-            html += `<span style="color:${color};">${name} ${sign}${eff[f]}</span> `;
-        }
-        return html || '—';
-    }
-
-    function makeChoice(idx) {
-        if (gameOver || gameWin || inBattle) return;
-        playClick();
-        const card = currentChoices[idx];
-        if (card.moral) { if (idx === 0) applyEffects(card.effA); else applyEffects(card.effB); }
-        else { applyEffects(card.eff); }
-        if (card.step && card.step === questFlags.ciriQuestProgress + 1) {
-            questFlags.ciriQuestProgress++;
-            if (questFlags.ciriQuestProgress === 3) { questFlags.ciriFound = true; achievements.ciriSavior.progress = 1; }
-        }
-        questFlags.cardsPlayed++;
-        if (questFlags.cardsPlayed >= 50) achievements.explorer.progress = 50;
-        year++;
-        updateUI(`Вы выбрали: ${card.title.ru}`);
-        if (!gameOver && !gameWin && year % 5 === 0 && gameMode !== 'sandbox') startBattle();
-        else drawCards();
-    }
-
-    function applyEffects(eff) {
-        for (let f in eff) factions[f] = Math.min(100, Math.max(0, factions[f] + eff[f]));
-    }
-
-    function startBattle() {
-        inBattle = true; playBattle();
-        battlePanel.style.display = 'block'; choiceArea.style.display = 'none';
-        boss = bosses[Math.min(Math.floor((year-1)/3), 4)];
-        let hpMod = 1.0;
-        if (difficulty === 'easy') hpMod = 0.7;
-        if (difficulty === 'hard') hpMod = 1.3;
-        if (gameMode === 'hardcore') hpMod = 1.5;
-        boss.hp = Math.floor(boss.hp * hpMod);
-        playerHp = maxHp;
-        document.getElementById('bossName').textContent = boss.name;
-        document.getElementById('bossHp').textContent = boss.hp;
-        document.getElementById('playerHp').textContent = playerHp;
-        updateUI(`⚔️ БИТВА С ${boss.name.toUpperCase()}!`);
-    }
-
-    function battleAction(action) {
-        playClick();
-        let dmg = 10 + Math.floor(Math.random() * 10);
-        let bossDmg = boss.attack;
-        if (action === 'dodge') bossDmg = Math.random() > 0.5 ? 0 : Math.floor(bossDmg * 0.5);
-        boss.hp -= dmg; playerHp -= bossDmg;
-        updateBattleUI(); checkBattleEnd();
-    }
-
-    function castSign(sign) {
-        playClick();
-        let dmg = 10 + Math.floor(Math.random() * 10);
-        let bossDmg = boss.attack;
-        if (sign === boss.weakness) { dmg *= 1.5; bossDmg *= 0.5; }
-        if (sign === 'quen') bossDmg = Math.floor(bossDmg * 0.3);
-        boss.hp -= dmg; playerHp -= bossDmg;
-        updateBattleUI(); checkBattleEnd();
-    }
-
-    function updateBattleUI() {
-        document.getElementById('bossHp').textContent = Math.max(0, boss.hp);
-        document.getElementById('playerHp').textContent = Math.max(0, playerHp);
-    }
-
-    function checkBattleEnd() {
-        if (boss.hp <= 0) {
-            playWin();
-            inBattle = false; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            questFlags.bossesKilled++;
-            if (questFlags.bossesKilled >= 5) achievements.monsterSlayer.progress = 5;
-            bestiary[boss.type].killed = true;
-            updateUI(`🎉 ${boss.name} повержен!`);
-            year++; drawCards();
-        } else if (playerHp <= 0) {
-            gameOver = true; battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-            updateUI('💀 Геральт погиб...');
-        }
-    }
-
-    function disableCards(disabled) {
-        document.getElementById('leftCard').classList.toggle('disabled', disabled);
-        document.getElementById('rightCard').classList.toggle('disabled', disabled);
-    }
-
-    // ========== ИНТЕРФЕЙС ==========
-    function openGwent() { initGwent(); document.getElementById('gwentOverlay').style.display = 'flex'; }
-    function closeGwent() { document.getElementById('gwentOverlay').style.display = 'none'; }
-    function openAchievements() {
-        let html = '';
-        for (let a in achievements) {
-            const ach = achievements[a];
-            html += `<div class="achievement ${ach.completed ? 'completed' : ''}">${ach.name}: ${ach.progress}/${ach.max}</div>`;
-        }
-        document.getElementById('achievementsList').innerHTML = html;
-        document.getElementById('achievementsOverlay').style.display = 'flex';
-    }
-    function closeAchievements() { document.getElementById('achievementsOverlay').style.display = 'none'; }
-    function openBestiary() {
-        let html = '';
-        for (let b in bestiary) {
-            const beast = bestiary[b];
-            html += `<div><b>${beast.name}</b> ${beast.killed ? '✅' : '❌'}<br><small>${beast.desc}</small></div><hr>`;
-        }
-        document.getElementById('bestiaryList').innerHTML = html;
-        document.getElementById('bestiaryOverlay').style.display = 'flex';
-    }
-    function closeBestiary() { document.getElementById('bestiaryOverlay').style.display = 'none'; }
-    function openJournal() {
-        let html = '';
-        witcherJournal.forEach(g => {
-            html += `<h4>${g.game}</h4><ul>`;
-            g.events.forEach(e => html += `<li>${e}</li>`);
-            html += '</ul>';
         });
-        document.getElementById('journalContent').innerHTML = html;
-        document.getElementById('journalOverlay').style.display = 'flex';
-    }
-    function closeJournal() { document.getElementById('journalOverlay').style.display = 'none'; }
-    function showNews() { document.getElementById('newsOverlay').style.display = 'flex'; }
-    function openSettings() { document.getElementById('settingsOverlay').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settingsOverlay').style.display = 'none'; }
-    function toggleTheme() {
-        document.body.classList.toggle('light-theme');
-        localStorage.setItem('witcher_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
-    }
-
-    function saveGame() {
-        if (gameMode === 'hardcore') return;
-        const save = { factions, year, questFlags, gameMode, difficulty };
-        if (tg.CloudStorage) tg.CloudStorage.setItem('witcher_save', JSON.stringify(save));
-    }
-
-    function resetGame() {
-        factions = { north: 50, nilfgaard: 50, magic: 50, witcher: 50 };
-        year = 1; gameOver = false; gameWin = false; inBattle = false;
-        questFlags = { ciriFound: false, ciriQuestProgress: 0, bossesKilled: 0, cardsPlayed: 0 };
-        battlePanel.style.display = 'none'; choiceArea.style.display = 'grid';
-        endMsg.innerHTML = '';
-        updateUI('Новая игра. Выберите карту.');
-        drawCards();
-    }
-
-    // ========== ЗАГРУЗКА ==========
-    if (tg.CloudStorage) {
-        tg.CloudStorage.getItem('witcher_save', (err, value) => {
-            if (!err && value) {
-                try {
-                    const save = JSON.parse(value);
-                    factions = save.factions; year = save.year;
-                    questFlags = save.questFlags;
-                    gameMode = save.gameMode || 'normal';
-                    difficulty = save.difficulty || 'normal';
-                } catch(e) {}
+        
+        // Монетки
+        coins.forEach(c => {
+            if (!c.collected && player.x < c.x + c.w && player.x + player.width > c.x &&
+                player.y < c.y + c.h && player.y + player.height > c.y) {
+                c.collected = true;
+                score += 10;
+                updateUI();
             }
-            resetGame();
         });
-    } else { resetGame(); }
-    bgMusic.play().catch(()=>{});
-    showNews();
+        
+        // Ключ
+        if (!key.collected && player.x < key.x + key.w && player.x + player.width > key.x &&
+            player.y < key.y + key.h && player.y + player.height > key.y) {
+            key.collected = true;
+            hasKey = true;
+        }
+        
+        // Дверь
+        if (hasKey && !door.opened && player.x < door.x + door.w && player.x + player.width > door.x &&
+            player.y < door.y + door.h && player.y + player.height > door.y) {
+            door.opened = true;
+            currentLevel++;
+            if (currentLevel > 3) {
+                gameActive = false;
+                document.getElementById('overlayTitle').textContent = '🏆 ПОБЕДА!';
+                document.getElementById('overlayMessage').textContent = 'Эльф сбежал из замка!';
+                document.getElementById('gameOverlay').classList.remove('hidden');
+            } else {
+                player.x = 50; player.y = 300;
+                buildLevel();
+                hasKey = false;
+            }
+        }
+        
+        // Враги
+        enemies.forEach(e => {
+            if (!e.alive) return;
+            e.x += e.vx;
+            if (e.x < e.minX || e.x + e.w > e.maxX) e.vx *= -1;
+            
+            if (player.x < e.x + e.w && player.x + player.width > e.x &&
+                player.y < e.y + e.h && player.y + player.height > e.y) {
+                player.health--;
+                player.x = 50; player.y = 300;
+                updateUI();
+                if (player.health <= 0) {
+                    gameActive = false;
+                    document.getElementById('gameOverlay').classList.remove('hidden');
+                }
+            }
+        });
+        
+        // Шипы
+        spikes.forEach(s => {
+            if (player.x < s.x + s.w && player.x + player.width > s.x &&
+                player.y + player.height > s.y && player.y < s.y + s.h) {
+                player.health--;
+                player.x = 50; player.y = 300;
+                updateUI();
+                if (player.health <= 0) {
+                    gameActive = false;
+                    document.getElementById('gameOverlay').classList.remove('hidden');
+                }
+            }
+        });
+    }
+    
+    function update() {
+        if (!gameActive) return;
+        
+        // Управление
+        if (keys.a) player.vx = -player.speed;
+        else if (keys.d) player.vx = player.speed;
+        else player.vx = 0;
+        
+        if (keys.space && player.grounded) {
+            player.vy = player.jumpPower;
+            player.grounded = false;
+        }
+        
+        // Гравитация
+        player.vy += 0.5;
+        player.y += player.vy;
+        player.x += player.vx;
+        
+        // Границы
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+        if (player.y > canvas.height) {
+            player.health = 0;
+            gameActive = false;
+            document.getElementById('gameOverlay').classList.remove('hidden');
+        }
+        
+        checkCollisions();
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Фон
+        ctx.fillStyle = '#0d0d15';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 20; i++) {
+            ctx.fillStyle = '#2a1a1a';
+            ctx.beginPath();
+            ctx.arc((i * 47) % canvas.width, (i * 31) % canvas.height, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Платформы
+        ctx.fillStyle = '#4a4a6a';
+        platforms.forEach(p => {
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.fillStyle = '#3a3a5a';
+            ctx.fillRect(p.x, p.y, p.w, 5);
+            ctx.fillStyle = '#4a4a6a';
+        });
+        
+        // Монетки
+        ctx.fillStyle = '#ffd700';
+        ctx.shadowColor = '#ffaa00';
+        ctx.shadowBlur = 10;
+        coins.forEach(c => { if (!c.collected) ctx.fillRect(c.x, c.y, c.w, c.h); });
+        
+        // Ключ
+        if (!key.collected) {
+            ctx.fillStyle = '#d4af37';
+            ctx.fillRect(key.x, key.y, key.w, key.h);
+        }
+        
+        // Дверь
+        ctx.fillStyle = door.opened ? '#5a3a1a' : '#8b4513';
+        ctx.fillRect(door.x, door.y, door.w, door.h);
+        if (!door.opened) {
+            ctx.fillStyle = '#d4af37';
+            ctx.beginPath();
+            ctx.arc(door.x + 20, door.y + 30, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Шипы
+        ctx.fillStyle = '#8b0000';
+        ctx.shadowBlur = 0;
+        spikes.forEach(s => { ctx.fillRect(s.x, s.y, s.w, s.h); });
+        
+        // Враги
+        ctx.fillStyle = '#2a5a2a';
+        ctx.shadowColor = '#0f0';
+        ctx.shadowBlur = 8;
+        enemies.forEach(e => { if (e.alive) ctx.fillRect(e.x, e.y, e.w, e.h); });
+        
+        // Игрок (эльф)
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#2a8a4a';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.fillStyle = '#1a6a3a';
+        ctx.fillRect(player.x + 5, player.y - 10, 8, 15); // уши
+        ctx.fillRect(player.x + 17, player.y - 10, 8, 15);
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(player.x + 10, player.y + 5, 10, 5); // пояс
+        
+        ctx.shadowBlur = 0;
+    }
+    
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+    
+    // Управление
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'a' || e.key === 'A') keys.a = true;
+        if (e.key === 'd' || e.key === 'D') keys.d = true;
+        if (e.key === ' ') { e.preventDefault(); keys.space = true; }
+    });
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'a' || e.key === 'A') keys.a = false;
+        if (e.key === 'd' || e.key === 'D') keys.d = false;
+        if (e.key === ' ') { e.preventDefault(); keys.space = false; }
+    });
+    
+    // Тач-управление для телефона
+    let touchLeft = false, touchRight = false, touchJump = false;
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = touch.clientX - rect.left;
+        if (x < canvas.width / 3) keys.a = true;
+        else if (x > canvas.width * 2 / 3) keys.d = true;
+        else keys.space = true;
+    });
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.a = false; keys.d = false; keys.space = false;
+    });
+    
+    document.getElementById('restartBtn').addEventListener('click', resetGame);
+    
+    updateUI();
+    gameLoop();
 </script>
 </body>
     </html>
